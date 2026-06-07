@@ -218,10 +218,42 @@ const HTML_PAGE = `
             display: none;
         }
         
-        .audio-player {
-            width: 100%;
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
             margin-bottom: 16px;
-            border-radius: var(--radius-md);
+            flex-wrap: wrap;
+        }
+        
+        .audio-controls .btn-primary {
+            flex-shrink: 0;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            min-width: 120px;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        
+        .time-display {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            min-width: 80px;
+            text-align: center;
         }
         
         .error-message {
@@ -890,7 +922,16 @@ const HTML_PAGE = `
                     </div>
                     
                     <div id="success" style="display: none;">
-                        <audio id="audioPlayer" class="audio-player" controls></audio>
+                        <div class="audio-controls">
+                            <button type="button" class="btn-primary" id="playBtn">
+                                <span>▶️</span>
+                                <span>播放</span>
+                            </button>
+                            <div class="progress-bar" id="progressBar" style="display: none;">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <span class="time-display" id="timeDisplay" style="display: none;"></span>
+                        </div>
                         <a id="downloadBtn" class="btn-secondary" download="speech.mp3">
                             <span>📥</span>
                             <span>下载音频文件</span>
@@ -1386,12 +1427,141 @@ const HTML_PAGE = `
                 const audioBlob = await response.blob();
                 const audioUrl = URL.createObjectURL(audioBlob);
                 
-                // 显示音频播放器
-                const audioPlayer = document.getElementById('audioPlayer');
+                // 显示播放按钮和下载
+                const playBtn = document.getElementById('playBtn');
+                const progressBar = document.getElementById('progressBar');
+                const progressFill = document.getElementById('progressFill');
+                const timeDisplay = document.getElementById('timeDisplay');
                 const downloadBtn = document.getElementById('downloadBtn');
                 
-                audioPlayer.src = audioUrl;
                 downloadBtn.href = audioUrl;
+                
+                let audioContext = null;
+                let audioBuffer = null;
+                let sourceNode = null;
+                let startTime = 0;
+                let pauseOffset = 0;
+                let isPlaying = false;
+                let animationId = null;
+                
+                async function initAudio() {
+                    if (!audioContext) {
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        const arrayBuffer = await audioBlob.arrayBuffer();
+                        audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                    }
+                }
+                
+                function formatTime(seconds) {
+                    const m = Math.floor(seconds / 60);
+                    const s = Math.floor(seconds % 60);
+                    return m + ':' + s.toString().padStart(2, '0');
+                }
+                
+                function updateProgress() {
+                    if (!isPlaying) return;
+                    const elapsed = (audioContext.currentTime - startTime) + pauseOffset;
+                    const duration = audioBuffer.duration;
+                    const percent = Math.min((elapsed / duration) * 100, 100);
+                    progressFill.style.width = percent + '%';
+                    timeDisplay.textContent = formatTime(elapsed) + ' / ' + formatTime(duration);
+                    
+                    if (elapsed >= duration) {
+                        stopPlayback();
+                    } else {
+                        animationId = requestAnimationFrame(updateProgress);
+                    }
+                }
+                
+                function stopPlayback() {
+                    if (sourceNode) {
+                        try { sourceNode.stop(); } catch(e) {}
+                        sourceNode = null;
+                    }
+                    isPlaying = false;
+                    pauseOffset = 0;
+                    progressFill.style.width = '0%';
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                        animationId = null;
+                    }
+                    playBtn.innerHTML = '<span>▶️</span><span>播放</span>';
+                    timeDisplay.textContent = formatTime(0) + ' / ' + formatTime(audioBuffer ? audioBuffer.duration : 0);
+                }
+                
+                playBtn.addEventListener('click', async function() {
+                    await initAudio();
+                    if (!audioBuffer) return;
+                    
+                    if (isPlaying) {
+                        // 暂停
+                        if (sourceNode) {
+                            try { sourceNode.stop(); } catch(e) {}
+                            sourceNode = null;
+                        }
+                        pauseOffset += audioContext.currentTime - startTime;
+                        isPlaying = false;
+                        if (animationId) {
+                            cancelAnimationFrame(animationId);
+                            animationId = null;
+                        }
+                        playBtn.innerHTML = '<span>▶️</span><span>继续</span>';
+                    } else {
+                        // 播放
+                        if (audioContext.state === 'suspended') {
+                            await audioContext.resume();
+                        }
+                        sourceNode = audioContext.createBufferSource();
+                        sourceNode.buffer = audioBuffer;
+                        sourceNode.connect(audioContext.destination);
+                        startTime = audioContext.currentTime;
+                        sourceNode.start(0, pauseOffset);
+                        isPlaying = true;
+                        playBtn.innerHTML = '<span>⏸️</span><span>暂停</span>';
+                        progressBar.style.display = 'block';
+                        timeDisplay.style.display = 'inline';
+                        timeDisplay.textContent = formatTime(pauseOffset) + ' / ' + formatTime(audioBuffer.duration);
+                        updateProgress();
+                        
+                        sourceNode.onended = function() {
+                            if (isPlaying) {
+                                stopPlayback();
+                            }
+                        };
+                    }
+                });
+                
+                // 点击进度条跳转
+                progressBar.addEventListener('click', async function(e) {
+                    await initAudio();
+                    if (!audioBuffer) return;
+                    const rect = progressBar.getBoundingClientRect();
+                    const percent = (e.clientX - rect.left) / rect.width;
+                    pauseOffset = percent * audioBuffer.duration;
+                    progressFill.style.width = (percent * 100) + '%';
+                    timeDisplay.textContent = formatTime(pauseOffset) + ' / ' + formatTime(audioBuffer.duration);
+                    
+                    if (isPlaying) {
+                        if (sourceNode) {
+                            try { sourceNode.stop(); } catch(e) {}
+                        }
+                        sourceNode = audioContext.createBufferSource();
+                        sourceNode.buffer = audioBuffer;
+                        sourceNode.connect(audioContext.destination);
+                        startTime = audioContext.currentTime;
+                        sourceNode.start(0, pauseOffset);
+                        sourceNode.onended = function() {
+                            if (isPlaying) stopPlayback();
+                        };
+                    }
+                });
+                
+                // 初始化显示
+                initAudio().then(() => {
+                    if (audioBuffer) {
+                        timeDisplay.textContent = formatTime(0) + ' / ' + formatTime(audioBuffer.duration);
+                    }
+                });
                 
                 loading.style.display = 'none';
                 success.style.display = 'block';
@@ -1652,9 +1822,11 @@ async function getVoice(text, voiceName = "zh-CN-XiaoxiaoNeural", rate = '+0%', 
         // 如果文本很短，直接处理
         if (cleanText.length <= 1500) {
             const audioBlob = await getAudioChunk(cleanText, voiceName, rate, pitch, volume, style, outputFormat);
-            return new Response(audioBlob, {
+            const audioBuffer = await audioBlob.arrayBuffer();
+            return new Response(audioBuffer, {
                 headers: {
                     "Content-Type": "audio/mpeg",
+                    "Content-Length": String(audioBuffer.byteLength),
                     ...makeCORSHeaders()
                 }
             });
@@ -1685,9 +1857,11 @@ async function getVoice(text, voiceName = "zh-CN-XiaoxiaoNeural", rate = '+0%', 
 
         // 将音频片段拼接起来
         const concatenatedAudio = new Blob(audioChunks, { type: 'audio/mpeg' });
-        return new Response(concatenatedAudio, {
+        const audioBuffer = await concatenatedAudio.arrayBuffer();
+        return new Response(audioBuffer, {
             headers: {
                 "Content-Type": "audio/mpeg",
+                "Content-Length": String(audioBuffer.byteLength),
                 ...makeCORSHeaders()
             }
         });
