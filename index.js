@@ -630,37 +630,13 @@ const HTML_PAGE = `
             </svg>
         </div>
         <div class="language-dropdown" id="languageDropdown">
-            <div class="language-option" data-lang="en">
-                <span>🇺🇸</span>
-                <span data-i18n="lang.en">English</span>
-            </div>
             <div class="language-option" data-lang="zh">
                 <span>🇨🇳</span>
                 <span data-i18n="lang.zh">中文</span>
             </div>
-            <div class="language-option" data-lang="ja">
-                <span>🇯🇵</span>
-                <span data-i18n="lang.ja">日本語</span>
-            </div>
-            <div class="language-option" data-lang="ko">
-                <span>🇰🇷</span>
-                <span data-i18n="lang.ko">한국어</span>
-            </div>
-            <div class="language-option" data-lang="es">
-                <span>🇪🇸</span>
-                <span data-i18n="lang.es">Español</span>
-            </div>
-            <div class="language-option" data-lang="fr">
-                <span>🇫🇷</span>
-                <span data-i18n="lang.fr">Français</span>
-            </div>
-            <div class="language-option" data-lang="de">
-                <span>🇩🇪</span>
-                <span data-i18n="lang.de">Deutsch</span>
-            </div>
-            <div class="language-option" data-lang="ru">
-                <span>🇷🇺</span>
-                <span data-i18n="lang.ru">Русский</span>
+            <div class="language-option" data-lang="en">
+                <span>🇺🇸</span>
+                <span data-i18n="lang.en">English</span>
             </div>
         </div>
     </div>
@@ -909,7 +885,7 @@ const HTML_PAGE = `
     <script>
         let selectedFile = null;
         let currentInputMethod = 'text'; // 'text' or 'file'
-        let currentLanguage = 'en'; // 默认语言
+        let currentLanguage = 'zh'; // 默认语言
 
         // 国际化翻译数据
         const translations = {
@@ -920,12 +896,6 @@ const HTML_PAGE = `
                 'lang.current': 'English',
                 'lang.en': 'English',
                 'lang.zh': '中文',
-                'lang.ja': '日本語',
-                'lang.ko': '한국어',
-                'lang.es': 'Español',
-                'lang.fr': 'Français',
-                'lang.de': 'Deutsch',
-                'lang.ru': 'Русский',
                 'header.title': 'VoiceTTS',
                 'header.subtitle': 'AI-Powered Voice Processing Platform',
                 'header.feature1': '20+ Voice Options',
@@ -977,12 +947,6 @@ const HTML_PAGE = `
                 'lang.current': '中文',
                 'lang.en': 'English',
                 'lang.zh': '中文',
-                'lang.ja': '日本語',
-                'lang.ko': '한국어',
-                'lang.es': 'Español',
-                'lang.fr': 'Français',
-                'lang.de': 'Deutsch',
-                'lang.ru': 'Русский',
                 'header.title': 'VoiceTTS',
                 'header.subtitle': 'AI驱动的语音处理平台',
                 'header.feature1': '20+种语音选项',
@@ -1027,379 +991,9 @@ const HTML_PAGE = `
                 'form.loading': '正在生成语音，请稍候...',
                 'form.download': '下载音频文件'
             },
-            ja: {
-                'page.title': 'VoiceTTS - AI音声処理プラットフォーム',
-                'page.description': 'VoiceTTSはAI駆動のプラットフォームで、テキスト読み上げと音声テキスト変換に対応。20以上の音声オプション、高速処理、完全無料でご利用いただけます。',
-                'page.keywords': 'テキスト読み上げ,AI音声合成,オンラインTTS,音声ジェネレーター,無料音声ツール,音声テキスト変換,音声転写',
-                'lang.current': '日本語',
-                'lang.en': 'English',
-                'lang.zh': '中文',
-                'lang.ja': '日本語',
-                'lang.ko': '한국어',
-                'lang.es': 'Español',
-                'lang.fr': 'Français',
-                'lang.de': 'Deutsch',
-                'lang.ru': 'Русский',
-                'header.title': 'VoiceTTS',
-                'header.subtitle': 'AI音声処理プラットフォーム',
-                'header.feature1': '20以上の音声オプション',
-                'header.feature2': '高速処理',
-                'header.feature3': '完全無料',
-                'header.feature4': 'ダウンロード対応',
-                'form.inputMethod': '入力方法',
-                'form.manualInput': '手動入力',
-                'form.uploadFile': 'ファイルアップロード',
-                'form.inputText': 'テキスト入力',
-                'form.textPlaceholder': '音声に変換するテキストを入力してください...',
-                'form.uploadTxt': 'TXTファイルをアップロード',
-                'form.dragHint': 'TXTファイルをここにドラッグ、またはクリックして選択',
-                'form.dragFormat': 'TXT形式対応、最大500KB',
-                'form.voice': '音声選択',
-                'form.speed': '速度調整',
-                'form.speedVerySlow': '🐌 非常に遅い',
-                'form.speedSlow': '🚶 遅い',
-                'form.speedNormal': '⚡ 標準',
-                'form.speedFast': '🏃 速い',
-                'form.speedVeryFast': '🚀 非常に速い',
-                'form.speedExtreme': '💨 超高速',
-                'form.pitch': '音程',
-                'form.pitchVeryLow': '📉 非常に低い',
-                'form.pitchLow': '📊 低い',
-                'form.pitchNormal': '🎵 標準',
-                'form.pitchHigh': '📈 高い',
-                'form.pitchVeryHigh': '🎶 非常に高い',
-                'form.style': '音声スタイル',
-                'form.styleGeneral': '🎭 一般',
-                'form.styleAssistant': '🤖 アシスタント',
-                'form.styleChat': '💬 チャット',
-                'form.styleCustomer': '📞 カスタマーサービス',
-                'form.styleNews': '📺 ニュース',
-                'form.styleAffectionate': '💕 愛情',
-                'form.styleCalm': '😌 落ち着き',
-                'form.styleCheerful': '😊 明るい',
-                'form.styleGentle': '🌸 優しい',
-                'form.styleLyrical': '🎼 叙情的',
-                'form.styleSerious': '🎯 真面目',
-                'form.generate': '音声を生成',
-                'form.loading': '音声を生成中、お待ちください...',
-                'form.download': '音声をダウンロード'
-            },
-            ko: {
-                'page.title': 'VoiceTTS - AI 음성 처리 플랫폼',
-                'page.description': 'VoiceTTS는 AI 기반 플랫폼으로 텍스트 음성 변환과 음성 텍스트 변환을 지원합니다. 20개 이상의 음성 옵션, 빠른 처리 속도, 완전 무료로 이용하실 수 있습니다.',
-                'page.keywords': '텍스트 음성 변환,AI 음성 합성,온라인 TTS,음성 생성기,무료 음성 도구,음성 텍스트 변환,음성 전사',
-                'lang.current': '한국어',
-                'lang.en': 'English',
-                'lang.zh': '中文',
-                'lang.ja': '日本語',
-                'lang.ko': '한국어',
-                'lang.es': 'Español',
-                'lang.fr': 'Français',
-                'lang.de': 'Deutsch',
-                'lang.ru': 'Русский',
-                'header.title': 'VoiceTTS',
-                'header.subtitle': 'AI 음성 처리 플랫폼',
-                'header.feature1': '20개 이상의 음성 옵션',
-                'header.feature2': '빠른 처리',
-                'header.feature3': '완전 무료',
-                'header.feature4': '다운로드 지원',
-                'mode.tts': '텍스트 음성 변환',
-                'mode.transcription': '음성 텍스트 변환',
-                'form.inputMethod': '입력 방식',
-                'form.manualInput': '직접 입력',
-                'form.uploadFile': '파일 업로드',
-                'form.inputText': '텍스트 입력',
-                'form.textPlaceholder': '음성으로 변환할 텍스트를 입력하세요...',
-                'form.uploadTxt': 'TXT 파일 업로드',
-                'form.dragHint': 'TXT 파일을 여기로 드래그하거나 클릭하여 선택',
-                'form.dragFormat': 'TXT 형식 지원, 최대 500KB',
-                'form.voice': '음성 선택',
-                'form.speed': '속도 조절',
-                'form.speedVerySlow': '🐌 매우 느림',
-                'form.speedSlow': '🚶 느림',
-                'form.speedNormal': '⚡ 보통',
-                'form.speedFast': '🏃 빠름',
-                'form.speedVeryFast': '🚀 매우 빠름',
-                'form.speedExtreme': '💨 최고속',
-                'form.pitch': '음조',
-                'form.pitchVeryLow': '📉 매우 낮음',
-                'form.pitchLow': '📊 낮음',
-                'form.pitchNormal': '🎵 보통',
-                'form.pitchHigh': '📈 높음',
-                'form.pitchVeryHigh': '🎶 매우 높음',
-                'form.style': '음성 스타일',
-                'form.styleGeneral': '🎭 일반',
-                'form.styleAssistant': '🤖 어시스턴트',
-                'form.styleChat': '💬 채팅',
-                'form.styleCustomer': '📞 고객 서비스',
-                'form.styleNews': '📺 뉴스',
-                'form.styleAffectionate': '💕 다정함',
-                'form.styleCalm': '😌 차분함',
-                'form.styleCheerful': '😊 쾌활함',
-                'form.styleGentle': '🌸 부드러움',
-                'form.styleLyrical': '🎼 서정적',
-                'form.styleSerious': '🎯 진지함',
-                'form.generate': '음성 생성 시작',
-                'form.loading': '음성 생성 중, 잠시만 기다려주세요...',
-                'form.download': '오디오 다운로드'
-            },
-            es: {
-                'page.title': 'VoiceTTS - Plataforma de Procesamiento de Voz con IA',
-                'page.description': 'VoiceTTS es una plataforma impulsada por IA que convierte texto a voz y voz a texto con más de 20 opciones de voz, procesamiento ultrarrápido, completamente gratis.',
-                'page.keywords': 'texto a voz,síntesis de voz IA,TTS en línea,generador de voz,herramientas de voz gratis,voz a texto,transcripción de voz',
-                'lang.current': 'Español',
-                'lang.en': 'English',
-                'lang.zh': '中文',
-                'lang.ja': '日本語',
-                'lang.ko': '한국어',
-                'lang.es': 'Español',
-                'lang.fr': 'Français',
-                'lang.de': 'Deutsch',
-                'lang.ru': 'Русский',
-                'header.title': 'VoiceTTS',
-                'header.subtitle': 'Plataforma de Procesamiento de Voz con IA',
-                'header.feature1': 'Más de 20 Opciones de Voz',
-                'header.feature2': 'Ultrarrápido',
-                'header.feature3': 'Completamente Gratis',
-                'header.feature4': 'Soporte de Descarga',
-                'mode.tts': 'Texto a Voz',
-                'mode.transcription': 'Voz a Texto',
-                'form.inputMethod': 'Método de entrada',
-                'form.manualInput': 'Entrada manual',
-                'form.uploadFile': 'Subir archivo',
-                'form.inputText': 'Ingresar texto',
-                'form.textPlaceholder': 'Ingrese el texto a convertir en voz...',
-                'form.uploadTxt': 'Subir archivo TXT',
-                'form.dragHint': 'Arrastre un archivo txt aquí, o haga clic para seleccionar',
-                'form.dragFormat': 'Formato TXT, máx 500KB',
-                'form.voice': 'Selección de voz',
-                'form.speed': 'Velocidad',
-                'form.speedVerySlow': '🐌 Muy lento',
-                'form.speedSlow': '🚶 Lento',
-                'form.speedNormal': '⚡ Normal',
-                'form.speedFast': '🏃 Rápido',
-                'form.speedVeryFast': '🚀 Muy rápido',
-                'form.speedExtreme': '💨 Extremo',
-                'form.pitch': 'Tono',
-                'form.pitchVeryLow': '📉 Muy bajo',
-                'form.pitchLow': '📊 Bajo',
-                'form.pitchNormal': '🎵 Normal',
-                'form.pitchHigh': '📈 Alto',
-                'form.pitchVeryHigh': '🎶 Muy alto',
-                'form.style': 'Estilo de voz',
-                'form.styleGeneral': '🎭 General',
-                'form.styleAssistant': '🤖 Asistente',
-                'form.styleChat': '💬 Chat',
-                'form.styleCustomer': '📞 Servicio al cliente',
-                'form.styleNews': '📺 Noticias',
-                'form.styleAffectionate': '💕 Afectuoso',
-                'form.styleCalm': '😌 Calmado',
-                'form.styleCheerful': '😊 Alegre',
-                'form.styleGentle': '🌸 Suave',
-                'form.styleLyrical': '🎼 Lírico',
-                'form.styleSerious': '🎯 Serio',
-                'form.generate': 'Generar voz',
-                'form.loading': 'Generando voz, espere...',
-                'form.download': 'Descargar audio'
-            },
-            fr: {
-                'page.title': 'VoiceTTS - Plateforme de Traitement Vocal IA',
-                'page.description': 'VoiceTTS est une plateforme alimentée par IA qui convertit le texte en parole et la parole en texte avec plus de 20 options vocales, traitement ultra-rapide, entièrement gratuit.',
-                'page.keywords': 'texte vers parole,synthèse vocale IA,TTS en ligne,générateur vocal,outils vocaux gratuits,parole vers texte,transcription vocale',
-                'lang.current': 'Français',
-                'lang.en': 'English',
-                'lang.zh': '中文',
-                'lang.ja': '日本語',
-                'lang.ko': '한국어',
-                'lang.es': 'Español',
-                'lang.fr': 'Français',
-                'lang.de': 'Deutsch',
-                'lang.ru': 'Русский',
-                'header.title': 'VoiceTTS',
-                'header.subtitle': 'Plateforme de Traitement Vocal IA',
-                'header.feature1': 'Plus de 20 Options Vocales',
-                'header.feature2': 'Ultra-rapide',
-                'header.feature3': 'Entièrement Gratuit',
-                'header.feature4': 'Support de Téléchargement',
-                'mode.tts': 'Texte vers Parole',
-                'mode.transcription': 'Parole vers Texte',
-                'form.inputMethod': 'Méthode de saisie',
-                'form.manualInput': 'Saisie manuelle',
-                'form.uploadFile': 'Télécharger un fichier',
-                'form.inputText': 'Saisir le texte',
-                'form.textPlaceholder': 'Entrez le texte à convertir en parole...',
-                'form.uploadTxt': 'Télécharger un fichier TXT',
-                'form.dragHint': 'Glissez un fichier txt ici, ou cliquez pour sélectionner',
-                'form.dragFormat': 'Format TXT, max 500 Ko',
-                'form.voice': 'Sélection de la voix',
-                'form.speed': 'Vitesse',
-                'form.speedVerySlow': '🐌 Très lent',
-                'form.speedSlow': '🚶 Lent',
-                'form.speedNormal': '⚡ Normal',
-                'form.speedFast': '🏃 Rapide',
-                'form.speedVeryFast': '🚀 Très rapide',
-                'form.speedExtreme': '💨 Extrême',
-                'form.pitch': 'Tonalité',
-                'form.pitchVeryLow': '📉 Très basse',
-                'form.pitchLow': '📊 Basse',
-                'form.pitchNormal': '🎵 Normale',
-                'form.pitchHigh': '📈 Haute',
-                'form.pitchVeryHigh': '🎶 Très haute',
-                'form.style': 'Style vocal',
-                'form.styleGeneral': '🎭 Général',
-                'form.styleAssistant': '🤖 Assistant',
-                'form.styleChat': '💬 Chat',
-                'form.styleCustomer': '📞 Service client',
-                'form.styleNews': '📺 Journal',
-                'form.styleAffectionate': '💕 Affectueux',
-                'form.styleCalm': '😌 Calme',
-                'form.styleCheerful': '😊 Joyeux',
-                'form.styleGentle': '🌸 Doux',
-                'form.styleLyrical': '🎼 Lyrique',
-                'form.styleSerious': '🎯 Sérieux',
-                'form.generate': 'Générer la parole',
-                'form.loading': 'Génération en cours, veuillez patienter...',
-                'form.download': 'Télécharger l\'audio'
-            },
-            de: {
-                'page.title': 'VoiceTTS - KI-gestützte Sprachverarbeitungsplattform',
-                'page.description': 'VoiceTTS ist eine KI-gestützte Plattform, die Text in Sprache und Sprache in Text umwandelt, mit über 20 Sprachoptionen, blitzschneller Verarbeitung, völlig kostenlos.',
-                'page.keywords': 'Text zu Sprache,KI-Sprachsynthese,Online-TTS,Sprachgenerator,kostenlose Sprachtools,Sprache zu Text,Sprachtranskription',
-                'lang.current': 'Deutsch',
-                'lang.en': 'English',
-                'lang.zh': '中文',
-                'lang.ja': '日本語',
-                'lang.ko': '한국어',
-                'lang.es': 'Español',
-                'lang.fr': 'Français',
-                'lang.de': 'Deutsch',
-                'lang.ru': 'Русский',
-                'header.title': 'VoiceTTS',
-                'header.subtitle': 'KI-gestützte Sprachverarbeitungsplattform',
-                'header.feature1': 'Über 20 Sprachoptionen',
-                'header.feature2': 'Blitzschnell',
-                'header.feature3': 'Völlig Kostenlos',
-                'header.feature4': 'Download-Unterstützung',
-                'mode.tts': 'Text zu Sprache',
-                'mode.transcription': 'Sprache zu Text',
-                'form.inputMethod': 'Eingabemethode',
-                'form.manualInput': 'Manuelle Eingabe',
-                'form.uploadFile': 'Datei hochladen',
-                'form.inputText': 'Text eingeben',
-                'form.textPlaceholder': 'Geben Sie den zu konvertierenden Text ein...',
-                'form.uploadTxt': 'TXT-Datei hochladen',
-                'form.dragHint': 'Ziehen Sie eine TXT-Datei hierher oder klicken Sie zum Auswählen',
-                'form.dragFormat': 'TXT-Format, max. 500 KB',
-                'form.voice': 'Stimme auswählen',
-                'form.speed': 'Geschwindigkeit',
-                'form.speedVerySlow': '🐌 Sehr langsam',
-                'form.speedSlow': '🚶 Langsam',
-                'form.speedNormal': '⚡ Normal',
-                'form.speedFast': '🏃 Schnell',
-                'form.speedVeryFast': '🚀 Sehr schnell',
-                'form.speedExtreme': '💨 Extrem',
-                'form.pitch': 'Tonhöhe',
-                'form.pitchVeryLow': '📉 Sehr tief',
-                'form.pitchLow': '📊 Tief',
-                'form.pitchNormal': '🎵 Normal',
-                'form.pitchHigh': '📈 Hoch',
-                'form.pitchVeryHigh': '🎶 Sehr hoch',
-                'form.style': 'Sprachstil',
-                'form.styleGeneral': '🎭 Allgemein',
-                'form.styleAssistant': '🤖 Assistent',
-                'form.styleChat': '💬 Chat',
-                'form.styleCustomer': '📞 Kundenservice',
-                'form.styleNews': '📺 Nachrichten',
-                'form.styleAffectionate': '💕 Zärtlich',
-                'form.styleCalm': '😌 Ruhig',
-                'form.styleCheerful': '😊 Fröhlich',
-                'form.styleGentle': '🌸 Sanft',
-                'form.styleLyrical': '🎼 Lyrisch',
-                'form.styleSerious': '🎯 Ernst',
-                'form.generate': 'Sprache generieren',
-                'form.loading': 'Sprache wird generiert, bitte warten...',
-                'form.download': 'Audio herunterladen'
-            },
-            ru: {
-                'page.title': 'VoiceTTS - ИИ-платформа обработки голоса',
-                'page.description': 'VoiceTTS - это платформа на базе ИИ, которая преобразует текст в речь и речь в текст с более чем 20 голосовыми опциями, молниеносной обработкой, совершенно бесплатно.',
-                'page.keywords': 'текст в речь,ИИ синтез речи,онлайн TTS,генератор голоса,бесплатные голосовые инструменты,речь в текст,транскрипция речи',
-                'lang.current': 'Русский',
-                'lang.en': 'English',
-                'lang.zh': '中文',
-                'lang.ja': '日本語',
-                'lang.ko': '한국어',
-                'lang.es': 'Español',
-                'lang.fr': 'Français',
-                'lang.de': 'Deutsch',
-                'lang.ru': 'Русский',
-                'header.title': 'VoiceTTS',
-                'header.subtitle': 'ИИ-платформа обработки голоса',
-                'header.feature1': 'Более 20 голосовых опций',
-                'header.feature2': 'Молниеносно',
-                'header.feature3': 'Совершенно Бесплатно',
-                'header.feature4': 'Поддержка Загрузки',
-                'mode.tts': 'Текст в Речь',
-                'mode.transcription': 'Речь в Текст',
-                'form.inputMethod': 'Метод ввода',
-                'form.manualInput': 'Ручной ввод',
-                'form.uploadFile': 'Загрузить файл',
-                'form.inputText': 'Введите текст',
-                'form.textPlaceholder': 'Введите текст для преобразования в речь...',
-                'form.uploadTxt': 'Загрузить TXT файл',
-                'form.dragHint': 'Перетащите txt файл сюда или нажмите для выбора',
-                'form.dragFormat': 'Формат TXT, макс. 500 КБ',
-                'form.voice': 'Выбор голоса',
-                'form.speed': 'Скорость',
-                'form.speedVerySlow': '🐌 Очень медленно',
-                'form.speedSlow': '🚶 Медленно',
-                'form.speedNormal': '⚡ Нормально',
-                'form.speedFast': '🏃 Быстро',
-                'form.speedVeryFast': '🚀 Очень быстро',
-                'form.speedExtreme': '💨 Экстремально',
-                'form.pitch': 'Тон',
-                'form.pitchVeryLow': '📉 Очень низкий',
-                'form.pitchLow': '📊 Низкий',
-                'form.pitchNormal': '🎵 Нормальный',
-                'form.pitchHigh': '📈 Высокий',
-                'form.pitchVeryHigh': '🎶 Очень высокий',
-                'form.style': 'Стиль речи',
-                'form.styleGeneral': '🎭 Общий',
-                'form.styleAssistant': '🤖 Ассистент',
-                'form.styleChat': '💬 Чат',
-                'form.styleCustomer': '📞 Служба поддержки',
-                'form.styleNews': '📺 Новости',
-                'form.styleAffectionate': '💕 Ласковый',
-                'form.styleCalm': '😌 Спокойный',
-                'form.styleCheerful': '😊 Весёлый',
-                'form.styleGentle': '🌸 Нежный',
-                'form.styleLyrical': '🎼 Лирический',
-                'form.styleSerious': '🎯 Серьёзный',
-                'form.generate': 'Создать речь',
-                'form.loading': 'Генерация речи, пожалуйста, подождите...',
-                'form.download': 'Скачать аудио'
-            }
         };
 
         // 国际化功能
-        // 翻译文本（通过 Workers 后端代理，无需翻墙）
-        async function translateText(text, targetLang) {
-            if (!text || !text.trim()) return text;
-            try {
-                const resp = await fetch('/v1/translate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, target: targetLang })
-                });
-                if (resp.ok) {
-                    const data = await resp.json();
-                    return data.translated || text;
-                }
-            } catch (e) {
-                console.error('翻译错误:', e);
-            }
-            return text;
-        }
         
         function detectLanguage() {
             // 检测浏览器语言
@@ -1657,34 +1251,6 @@ const HTML_PAGE = `
                     let text = document.getElementById('text').value;
                     textLength = text.length;
                     
-                    // 自动翻译：根据语音语言翻译文本
-                    const voiceLang = voice.substring(0, 5); // e.g. "zh-CN", "en-US"
-                    const voiceLangShort = voice.split('-')[0]; // e.g. "zh", "en"
-                    const targetLangMap = {
-                        'zh-CN': 'zh', 'zh-TW': 'zh-TW',
-                        'en-US': 'en', 'en-GB': 'en', 'en-AU': 'en',
-                        'ja-JP': 'ja', 'ko-KR': 'ko', 'fr-FR': 'fr', 'fr-CA': 'fr',
-                        'de-DE': 'de', 'es-ES': 'es', 'es-MX': 'es',
-                        'ru-RU': 'ru', 'vi-VN': 'vi', 'ms-MY': 'ms', 'th-TH': 'th'
-                    };
-                    const targetLang = targetLangMap[voiceLang] || voiceLangShort;
-                    
-                    // 如果选择的不是中文语音，自动翻译文本到对应语言
-                    if (targetLang !== 'zh') {
-                        try {
-                            loadingText.textContent = '正在翻译文本...';
-                            progressInfo.textContent = '文本长度: ' + textLength + ' 字符';
-                            const translatedText = await translateText(text, targetLang);
-                            if (translatedText && translatedText !== text) {
-                                text = translatedText;
-                                loadingText.textContent = '翻译完成，正在生成语音...';
-                            }
-                        } catch (translateErr) {
-                            console.log('翻译失败，使用原始文本:', translateErr);
-                            // 翻译失败继续使用原始文本
-                        }
-                    }
-                    
                     // 根据文本长度显示不同的提示
                     if (textLength > 3000) {
                         loadingText.textContent = '正在处理长文本，请耐心等待...';
@@ -1841,21 +1407,6 @@ async function handleRequest(request) {
                 ...makeCORSHeaders()
             }
         });
-    }
-
-    if (path === "/v1/translate") {
-        try {
-            const { text, target } = await request.json();
-            const translated = await translateWithMicrosoft(text, target);
-            return new Response(JSON.stringify({ translated }), {
-                headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
-            });
-        } catch (error) {
-            return new Response(JSON.stringify({ error: error.message }), {
-                status: 500,
-                headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
-            });
-        }
     }
 
     if (path === "/v1/audio/speech") {
@@ -2269,31 +1820,6 @@ async function getEndpoint() {
     }
 }
 
-// Microsoft Translator API (free, via Workers proxy — not blocked by GFW)
-async function translateWithMicrosoft(text, targetLang) {
-    if (!text || !text.trim()) return text;
-    try {
-        const endpoint = await getEndpoint();
-        const url = 'https://' + endpoint.r + '.translate.microsoft.com/translate?api-version=3.0&to=' + targetLang;
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + endpoint.t,
-                'Content-Type': 'application/json; charset=utf-8',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            },
-            body: JSON.stringify([{ Text: text }])
-        });
-        if (!response.ok) throw new Error('translate failed: ' + response.status);
-        const data = await response.json();
-        if (data && data[0] && data[0].translations && data[0].translations[0]) {
-            return data[0].translations[0].text;
-        }
-    } catch (error) {
-        console.error('Microsoft translate failed:', error);
-    }
-    return text;
-}
 
 function makeCORSHeaders() {
     return {
