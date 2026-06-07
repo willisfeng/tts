@@ -1811,19 +1811,35 @@ function getSsml(text, voiceName, rate, pitch, volume, style, slien = 0) {
     // 对文本进行XML转义
     const escapedText = escapeXmlText(text);
     
+    // 从 voiceName 提取语言代码 (如 zh-CN, en-US)
+    const langMatch = voiceName.match(/^([a-z]{2}-[A-Z]{2})/);
+    const lang = langMatch ? langMatch[1] : 'en-US';
+    
+    // 只有中文语音支持 style 属性，其他语言不需要
+    const isChineseVoice = voiceName.startsWith('zh-CN');
+    
     let slien_str = '';
     if (slien > 0) {
         slien_str = `<break time="${slien}ms" />`
     }
-    return `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" version="1.0" xml:lang="zh-CN"> 
-                <voice name="${voiceName}"> 
-                    <mstts:express-as style="${style}"  styledegree="2.0" role="default" > 
+    
+    if (isChineseVoice) {
+        return `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" version="1.0" xml:lang="${lang}"> 
+                    <voice name="${voiceName}"> 
+                        <mstts:express-as style="${style}" styledegree="2.0" role="default"> 
+                            <prosody rate="${rate}" pitch="${pitch}" volume="${volume}">${escapedText}</prosody> 
+                        </mstts:express-as> 
+                        ${slien_str}
+                    </voice> 
+                </speak>`;
+    } else {
+        return `<speak xmlns="http://www.w3.org/2001/10/synthesis" xmlns:mstts="http://www.w3.org/2001/mstts" version="1.0" xml:lang="${lang}"> 
+                    <voice name="${voiceName}"> 
                         <prosody rate="${rate}" pitch="${pitch}" volume="${volume}">${escapedText}</prosody> 
-                    </mstts:express-as> 
-                    ${slien_str}
-                </voice> 
-            </speak>`;
-
+                        ${slien_str}
+                    </voice> 
+                </speak>`;
+    }
 }
 
 async function getEndpoint() {
