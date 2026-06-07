@@ -695,7 +695,7 @@ const HTML_PAGE = `
                 <form id="ttsForm">
                     <!-- 输入方式选择 -->
                     <div class="form-group">
-                        <label class="form-label">选择输入方式</label>
+                        <label class="form-label" data-i18n="form.inputMethod">选择输入方式</label>
                         <div class="input-method-tabs">
                             <button type="button" class="tab-btn active" id="textInputTab">
                                 <span class="tab-icon">
@@ -703,7 +703,7 @@ const HTML_PAGE = `
                                         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
                                     </svg>
                                 </span>
-                                <span>手动输入</span>
+                                <span data-i18n="form.manualInput">手动输入</span>
                             </button>
                             <button type="button" class="tab-btn" id="fileUploadTab">
                                 <span class="tab-icon">
@@ -711,20 +711,20 @@ const HTML_PAGE = `
                                         <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
                                     </svg>
                                 </span>
-                                <span>上传文件</span>
+                                <span data-i18n="form.uploadFile">上传文件</span>
                             </button>
                         </div>
                     </div>
 
                     <!-- 手动输入区域 -->
                     <div class="form-group" id="textInputArea">
-                        <label class="form-label" for="text">输入文本</label>
-                        <textarea class="form-textarea" id="text" placeholder="请输入要转换为语音的文本内容，支持中文、英文、数字等..." required></textarea>
+                        <label class="form-label" for="text" data-i18n="form.inputText">输入文本</label>
+                        <textarea class="form-textarea" id="text" data-i18n-placeholder="form.textPlaceholder" placeholder="请输入要转换为语音的文本内容，支持中文、英文、数字等..." required></textarea>
                     </div>
 
                     <!-- 文件上传区域 -->
                     <div class="form-group" id="fileUploadArea" style="display: none;">
-                        <label class="form-label" for="fileInput">上传txt文件</label>
+                        <label class="form-label" for="fileInput" data-i18n="form.uploadTxt">上传txt文件</label>
                         <div class="file-upload-container">
                             <div class="file-drop-zone" id="fileDropZone">
                                 <div class="file-drop-content">
@@ -734,8 +734,8 @@ const HTML_PAGE = `
                                             <path d="M14 2H6A2 2 0 0 0 4 4V20A2 2 0 0 0 6 22H18A2 2 0 0 0 20 20V8L14 2M18 20H6V4H13V9H18V20Z"/>
                                         </svg>
                                     </div>
-                                    <p class="file-drop-text">拖拽txt文件到此处，或点击选择文件</p>
-                                    <p class="file-drop-hint">支持txt格式，最大500KB</p>
+                                    <p class="file-drop-text" data-i18n="form.dragHint">拖拽txt文件到此处，或点击选择文件</p>
+                                    <p class="file-drop-hint" data-i18n="form.dragFormat">支持txt格式，最大500KB</p>
                                 </div>
                                 <input type="file" id="fileInput" accept=".txt,text/plain" style="display: none;">
                             </div>
@@ -751,7 +751,7 @@ const HTML_PAGE = `
                 
                     <div class="controls-grid">
                         <div class="form-group">
-                            <label class="form-label" for="voice">语音选择</label>
+                            <label class="form-label" for="voice" data-i18n="form.voice">语音选择</label>
                             <select class="form-select" id="voice">
                                 <optgroup label="🇨🇳 中文 (Chinese)">
                                     <option value="zh-CN-XiaoxiaoNeural" selected>晓晓 Xiaoxiao (女声·温柔)</option>
@@ -836,56 +836,56 @@ const HTML_PAGE = `
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label" for="speed">语速调节</label>
+                            <label class="form-label" for="speed" data-i18n="form.speed">语速调节</label>
                             <select class="form-select" id="speed">
-                                <option value="0.5">🐌 很慢</option>
-                                <option value="0.75">🚶 慢速</option>
-                                <option value="1.0" selected>⚡ 正常</option>
-                                <option value="1.25">🏃 快速</option>
-                                <option value="1.5">🚀 很快</option>
-                                <option value="2.0">💨 极速</option>
+                                <option value="0.5" data-i18n="form.speedVerySlow">🐌 很慢</option>
+                                <option value="0.75" data-i18n="form.speedSlow">🚶 慢速</option>
+                                <option value="1.0" selected data-i18n="form.speedNormal">⚡ 正常</option>
+                                <option value="1.25" data-i18n="form.speedFast">🏃 快速</option>
+                                <option value="1.5" data-i18n="form.speedVeryFast">🚀 很快</option>
+                                <option value="2.0" data-i18n="form.speedExtreme">💨 极速</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label" for="pitch">音调高低</label>
+                            <label class="form-label" for="pitch" data-i18n="form.pitch">音调高低</label>
                             <select class="form-select" id="pitch">
-                                <option value="-50">📉 很低沉</option>
-                                <option value="-25">📊 低沉</option>
-                                <option value="0" selected>🎵 标准</option>
-                                <option value="25">📈 高亢</option>
-                                <option value="50">🎶 很高亢</option>
+                                <option value="-50" data-i18n="form.pitchVeryLow">📉 很低沉</option>
+                                <option value="-25" data-i18n="form.pitchLow">📊 低沉</option>
+                                <option value="0" selected data-i18n="form.pitchNormal">🎵 标准</option>
+                                <option value="25" data-i18n="form.pitchHigh">📈 高亢</option>
+                                <option value="50" data-i18n="form.pitchVeryHigh">🎶 很高亢</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label" for="style">语音风格</label>
+                            <label class="form-label" for="style" data-i18n="form.style">语音风格</label>
                             <select class="form-select" id="style">
-                                <option value="general" selected>🎭 通用风格</option>
-                                <option value="assistant">🤖 智能助手</option>
-                                <option value="chat">💬 聊天对话</option>
-                                <option value="customerservice">📞 客服专业</option>
-                                <option value="newscast">📺 新闻播报</option>
-                                <option value="affectionate">💕 亲切温暖</option>
-                                <option value="calm">😌 平静舒缓</option>
-                                <option value="cheerful">😊 愉快欢乐</option>
-                                <option value="gentle">🌸 温和柔美</option>
-                                <option value="lyrical">🎼 抒情诗意</option>
-                                <option value="serious">🎯 严肃正式</option>
+                                <option value="general" selected data-i18n="form.styleGeneral">🎭 通用风格</option>
+                                <option value="assistant" data-i18n="form.styleAssistant">🤖 智能助手</option>
+                                <option value="chat" data-i18n="form.styleChat">💬 聊天对话</option>
+                                <option value="customerservice" data-i18n="form.styleCustomer">📞 客服专业</option>
+                                <option value="newscast" data-i18n="form.styleNews">📺 新闻播报</option>
+                                <option value="affectionate" data-i18n="form.styleAffectionate">💕 亲切温暖</option>
+                                <option value="calm" data-i18n="form.styleCalm">😌 平静舒缓</option>
+                                <option value="cheerful" data-i18n="form.styleCheerful">😊 愉快欢乐</option>
+                                <option value="gentle" data-i18n="form.styleGentle">🌸 温和柔美</option>
+                                <option value="lyrical" data-i18n="form.styleLyrical">🎼 抒情诗意</option>
+                                <option value="serious" data-i18n="form.styleSerious">🎯 严肃正式</option>
                             </select>
                         </div>
                     </div>
                     
                     <button type="submit" class="btn-primary" id="generateBtn">
                         <span>🎙️</span>
-                        <span>开始生成语音</span>
+                        <span data-i18n="form.generate">开始生成语音</span>
                     </button>
             </form>
             
                 <div id="result" class="result-container">
                     <div id="loading" class="loading-container" style="display: none;">
                         <div class="loading-spinner"></div>
-                        <p class="loading-text" id="loadingText">正在生成语音，请稍候...</p>
+                        <p class="loading-text" id="loadingText" data-i18n="form.loading">正在生成语音，请稍候...</p>
                         <div class="progress-info" id="progressInfo" style="margin-top: 12px; font-size: 0.875rem; color: var(--text-secondary);"></div>
                     </div>
                     
@@ -893,7 +893,7 @@ const HTML_PAGE = `
                         <audio id="audioPlayer" class="audio-player" controls></audio>
                         <a id="downloadBtn" class="btn-secondary" download="speech.mp3">
                             <span>📥</span>
-                            <span>下载音频文件</span>
+                            <span data-i18n="form.download">下载音频文件</span>
                         </a>
                     </div>
                     
@@ -932,8 +932,43 @@ const HTML_PAGE = `
                 'header.feature2': 'Lightning Fast',
                 'header.feature3': 'Completely Free',
                 'header.feature4': 'Download Support',
-                'mode.tts': 'Text to Speech',
-                'mode.transcription': 'Speech to Text'
+                'form.inputMethod': 'Input Method',
+                'form.manualInput': 'Manual Input',
+                'form.uploadFile': 'Upload File',
+                'form.inputText': 'Enter Text',
+                'form.textPlaceholder': 'Enter text to convert to speech...',
+                'form.uploadTxt': 'Upload TXT File',
+                'form.dragHint': 'Drag and drop a txt file here, or click to select',
+                'form.dragFormat': 'Supports TXT format, max 500KB',
+                'form.voice': 'Voice Selection',
+                'form.speed': 'Speed',
+                'form.speedVerySlow': '🐌 Very Slow',
+                'form.speedSlow': '🚶 Slow',
+                'form.speedNormal': '⚡ Normal',
+                'form.speedFast': '🏃 Fast',
+                'form.speedVeryFast': '🚀 Very Fast',
+                'form.speedExtreme': '💨 Extreme',
+                'form.pitch': 'Pitch',
+                'form.pitchVeryLow': '📉 Very Low',
+                'form.pitchLow': '📊 Low',
+                'form.pitchNormal': '🎵 Normal',
+                'form.pitchHigh': '📈 High',
+                'form.pitchVeryHigh': '🎶 Very High',
+                'form.style': 'Voice Style',
+                'form.styleGeneral': '🎭 General',
+                'form.styleAssistant': '🤖 Assistant',
+                'form.styleChat': '💬 Chat',
+                'form.styleCustomer': '📞 Customer Service',
+                'form.styleNews': '📺 Newscast',
+                'form.styleAffectionate': '💕 Affectionate',
+                'form.styleCalm': '😌 Calm',
+                'form.styleCheerful': '😊 Cheerful',
+                'form.styleGentle': '🌸 Gentle',
+                'form.styleLyrical': '🎼 Lyrical',
+                'form.styleSerious': '🎯 Serious',
+                'form.generate': 'Generate Speech',
+                'form.loading': 'Generating speech, please wait...',
+                'form.download': 'Download Audio'
             },
             zh: {
                 'page.title': 'VoiceTTS - AI驱动的语音处理平台',
@@ -954,8 +989,43 @@ const HTML_PAGE = `
                 'header.feature2': '闪电般快速',
                 'header.feature3': '完全免费',
                 'header.feature4': '支持下载',
-                'mode.tts': '文字转语音',
-                'mode.transcription': '语音转文字'
+                'form.inputMethod': '选择输入方式',
+                'form.manualInput': '手动输入',
+                'form.uploadFile': '上传文件',
+                'form.inputText': '输入文本',
+                'form.textPlaceholder': '请输入要转换为语音的文本内容，支持中文、英文、数字等...',
+                'form.uploadTxt': '上传txt文件',
+                'form.dragHint': '拖拽txt文件到此处，或点击选择文件',
+                'form.dragFormat': '支持txt格式，最大500KB',
+                'form.voice': '语音选择',
+                'form.speed': '语速调节',
+                'form.speedVerySlow': '🐌 很慢',
+                'form.speedSlow': '🚶 慢速',
+                'form.speedNormal': '⚡ 正常',
+                'form.speedFast': '🏃 快速',
+                'form.speedVeryFast': '🚀 很快',
+                'form.speedExtreme': '💨 极速',
+                'form.pitch': '音调高低',
+                'form.pitchVeryLow': '📉 很低沉',
+                'form.pitchLow': '📊 低沉',
+                'form.pitchNormal': '🎵 标准',
+                'form.pitchHigh': '📈 高亢',
+                'form.pitchVeryHigh': '🎶 很高亢',
+                'form.style': '语音风格',
+                'form.styleGeneral': '🎭 通用风格',
+                'form.styleAssistant': '🤖 智能助手',
+                'form.styleChat': '💬 聊天对话',
+                'form.styleCustomer': '📞 客服专业',
+                'form.styleNews': '📺 新闻播报',
+                'form.styleAffectionate': '💕 亲切温暖',
+                'form.styleCalm': '😌 平静舒缓',
+                'form.styleCheerful': '😊 愉快欢乐',
+                'form.styleGentle': '🌸 温和柔美',
+                'form.styleLyrical': '🎼 抒情诗意',
+                'form.styleSerious': '🎯 严肃正式',
+                'form.generate': '开始生成语音',
+                'form.loading': '正在生成语音，请稍候...',
+                'form.download': '下载音频文件'
             },
             ja: {
                 'page.title': 'VoiceTTS - AI音声処理プラットフォーム',
@@ -976,8 +1046,43 @@ const HTML_PAGE = `
                 'header.feature2': '高速処理',
                 'header.feature3': '完全無料',
                 'header.feature4': 'ダウンロード対応',
-                'mode.tts': 'テキスト読み上げ',
-                'mode.transcription': '音声テキスト変換'
+                'form.inputMethod': '入力方法',
+                'form.manualInput': '手動入力',
+                'form.uploadFile': 'ファイルアップロード',
+                'form.inputText': 'テキスト入力',
+                'form.textPlaceholder': '音声に変換するテキストを入力してください...',
+                'form.uploadTxt': 'TXTファイルをアップロード',
+                'form.dragHint': 'TXTファイルをここにドラッグ、またはクリックして選択',
+                'form.dragFormat': 'TXT形式対応、最大500KB',
+                'form.voice': '音声選択',
+                'form.speed': '速度調整',
+                'form.speedVerySlow': '🐌 非常に遅い',
+                'form.speedSlow': '🚶 遅い',
+                'form.speedNormal': '⚡ 標準',
+                'form.speedFast': '🏃 速い',
+                'form.speedVeryFast': '🚀 非常に速い',
+                'form.speedExtreme': '💨 超高速',
+                'form.pitch': '音程',
+                'form.pitchVeryLow': '📉 非常に低い',
+                'form.pitchLow': '📊 低い',
+                'form.pitchNormal': '🎵 標準',
+                'form.pitchHigh': '📈 高い',
+                'form.pitchVeryHigh': '🎶 非常に高い',
+                'form.style': '音声スタイル',
+                'form.styleGeneral': '🎭 一般',
+                'form.styleAssistant': '🤖 アシスタント',
+                'form.styleChat': '💬 チャット',
+                'form.styleCustomer': '📞 カスタマーサービス',
+                'form.styleNews': '📺 ニュース',
+                'form.styleAffectionate': '💕 愛情',
+                'form.styleCalm': '😌 落ち着き',
+                'form.styleCheerful': '😊 明るい',
+                'form.styleGentle': '🌸 優しい',
+                'form.styleLyrical': '🎼 叙情的',
+                'form.styleSerious': '🎯 真面目',
+                'form.generate': '音声を生成',
+                'form.loading': '音声を生成中、お待ちください...',
+                'form.download': '音声をダウンロード'
             },
             ko: {
                 'page.title': 'VoiceTTS - AI 음성 처리 플랫폼',
@@ -999,7 +1104,44 @@ const HTML_PAGE = `
                 'header.feature3': '완전 무료',
                 'header.feature4': '다운로드 지원',
                 'mode.tts': '텍스트 음성 변환',
-                'mode.transcription': '음성 텍스트 변환'
+                'mode.transcription': '음성 텍스트 변환',
+                'form.inputMethod': '입력 방식',
+                'form.manualInput': '직접 입력',
+                'form.uploadFile': '파일 업로드',
+                'form.inputText': '텍스트 입력',
+                'form.textPlaceholder': '음성으로 변환할 텍스트를 입력하세요...',
+                'form.uploadTxt': 'TXT 파일 업로드',
+                'form.dragHint': 'TXT 파일을 여기로 드래그하거나 클릭하여 선택',
+                'form.dragFormat': 'TXT 형식 지원, 최대 500KB',
+                'form.voice': '음성 선택',
+                'form.speed': '속도 조절',
+                'form.speedVerySlow': '🐌 매우 느림',
+                'form.speedSlow': '🚶 느림',
+                'form.speedNormal': '⚡ 보통',
+                'form.speedFast': '🏃 빠름',
+                'form.speedVeryFast': '🚀 매우 빠름',
+                'form.speedExtreme': '💨 최고속',
+                'form.pitch': '음조',
+                'form.pitchVeryLow': '📉 매우 낮음',
+                'form.pitchLow': '📊 낮음',
+                'form.pitchNormal': '🎵 보통',
+                'form.pitchHigh': '📈 높음',
+                'form.pitchVeryHigh': '🎶 매우 높음',
+                'form.style': '음성 스타일',
+                'form.styleGeneral': '🎭 일반',
+                'form.styleAssistant': '🤖 어시스턴트',
+                'form.styleChat': '💬 채팅',
+                'form.styleCustomer': '📞 고객 서비스',
+                'form.styleNews': '📺 뉴스',
+                'form.styleAffectionate': '💕 다정함',
+                'form.styleCalm': '😌 차분함',
+                'form.styleCheerful': '😊 쾌활함',
+                'form.styleGentle': '🌸 부드러움',
+                'form.styleLyrical': '🎼 서정적',
+                'form.styleSerious': '🎯 진지함',
+                'form.generate': '음성 생성 시작',
+                'form.loading': '음성 생성 중, 잠시만 기다려주세요...',
+                'form.download': '오디오 다운로드'
             },
             es: {
                 'page.title': 'VoiceTTS - Plataforma de Procesamiento de Voz con IA',
@@ -1021,7 +1163,44 @@ const HTML_PAGE = `
                 'header.feature3': 'Completamente Gratis',
                 'header.feature4': 'Soporte de Descarga',
                 'mode.tts': 'Texto a Voz',
-                'mode.transcription': 'Voz a Texto'
+                'mode.transcription': 'Voz a Texto',
+                'form.inputMethod': 'Método de entrada',
+                'form.manualInput': 'Entrada manual',
+                'form.uploadFile': 'Subir archivo',
+                'form.inputText': 'Ingresar texto',
+                'form.textPlaceholder': 'Ingrese el texto a convertir en voz...',
+                'form.uploadTxt': 'Subir archivo TXT',
+                'form.dragHint': 'Arrastre un archivo txt aquí, o haga clic para seleccionar',
+                'form.dragFormat': 'Formato TXT, máx 500KB',
+                'form.voice': 'Selección de voz',
+                'form.speed': 'Velocidad',
+                'form.speedVerySlow': '🐌 Muy lento',
+                'form.speedSlow': '🚶 Lento',
+                'form.speedNormal': '⚡ Normal',
+                'form.speedFast': '🏃 Rápido',
+                'form.speedVeryFast': '🚀 Muy rápido',
+                'form.speedExtreme': '💨 Extremo',
+                'form.pitch': 'Tono',
+                'form.pitchVeryLow': '📉 Muy bajo',
+                'form.pitchLow': '📊 Bajo',
+                'form.pitchNormal': '🎵 Normal',
+                'form.pitchHigh': '📈 Alto',
+                'form.pitchVeryHigh': '🎶 Muy alto',
+                'form.style': 'Estilo de voz',
+                'form.styleGeneral': '🎭 General',
+                'form.styleAssistant': '🤖 Asistente',
+                'form.styleChat': '💬 Chat',
+                'form.styleCustomer': '📞 Servicio al cliente',
+                'form.styleNews': '📺 Noticias',
+                'form.styleAffectionate': '💕 Afectuoso',
+                'form.styleCalm': '😌 Calmado',
+                'form.styleCheerful': '😊 Alegre',
+                'form.styleGentle': '🌸 Suave',
+                'form.styleLyrical': '🎼 Lírico',
+                'form.styleSerious': '🎯 Serio',
+                'form.generate': 'Generar voz',
+                'form.loading': 'Generando voz, espere...',
+                'form.download': 'Descargar audio'
             },
             fr: {
                 'page.title': 'VoiceTTS - Plateforme de Traitement Vocal IA',
@@ -1043,7 +1222,44 @@ const HTML_PAGE = `
                 'header.feature3': 'Entièrement Gratuit',
                 'header.feature4': 'Support de Téléchargement',
                 'mode.tts': 'Texte vers Parole',
-                'mode.transcription': 'Parole vers Texte'
+                'mode.transcription': 'Parole vers Texte',
+                'form.inputMethod': 'Méthode de saisie',
+                'form.manualInput': 'Saisie manuelle',
+                'form.uploadFile': 'Télécharger un fichier',
+                'form.inputText': 'Saisir le texte',
+                'form.textPlaceholder': 'Entrez le texte à convertir en parole...',
+                'form.uploadTxt': 'Télécharger un fichier TXT',
+                'form.dragHint': 'Glissez un fichier txt ici, ou cliquez pour sélectionner',
+                'form.dragFormat': 'Format TXT, max 500 Ko',
+                'form.voice': 'Sélection de la voix',
+                'form.speed': 'Vitesse',
+                'form.speedVerySlow': '🐌 Très lent',
+                'form.speedSlow': '🚶 Lent',
+                'form.speedNormal': '⚡ Normal',
+                'form.speedFast': '🏃 Rapide',
+                'form.speedVeryFast': '🚀 Très rapide',
+                'form.speedExtreme': '💨 Extrême',
+                'form.pitch': 'Tonalité',
+                'form.pitchVeryLow': '📉 Très basse',
+                'form.pitchLow': '📊 Basse',
+                'form.pitchNormal': '🎵 Normale',
+                'form.pitchHigh': '📈 Haute',
+                'form.pitchVeryHigh': '🎶 Très haute',
+                'form.style': 'Style vocal',
+                'form.styleGeneral': '🎭 Général',
+                'form.styleAssistant': '🤖 Assistant',
+                'form.styleChat': '💬 Chat',
+                'form.styleCustomer': '📞 Service client',
+                'form.styleNews': '📺 Journal',
+                'form.styleAffectionate': '💕 Affectueux',
+                'form.styleCalm': '😌 Calme',
+                'form.styleCheerful': '😊 Joyeux',
+                'form.styleGentle': '🌸 Doux',
+                'form.styleLyrical': '🎼 Lyrique',
+                'form.styleSerious': '🎯 Sérieux',
+                'form.generate': 'Générer la parole',
+                'form.loading': 'Génération en cours, veuillez patienter...',
+                'form.download': 'Télécharger l\'audio'
             },
             de: {
                 'page.title': 'VoiceTTS - KI-gestützte Sprachverarbeitungsplattform',
@@ -1065,7 +1281,44 @@ const HTML_PAGE = `
                 'header.feature3': 'Völlig Kostenlos',
                 'header.feature4': 'Download-Unterstützung',
                 'mode.tts': 'Text zu Sprache',
-                'mode.transcription': 'Sprache zu Text'
+                'mode.transcription': 'Sprache zu Text',
+                'form.inputMethod': 'Eingabemethode',
+                'form.manualInput': 'Manuelle Eingabe',
+                'form.uploadFile': 'Datei hochladen',
+                'form.inputText': 'Text eingeben',
+                'form.textPlaceholder': 'Geben Sie den zu konvertierenden Text ein...',
+                'form.uploadTxt': 'TXT-Datei hochladen',
+                'form.dragHint': 'Ziehen Sie eine TXT-Datei hierher oder klicken Sie zum Auswählen',
+                'form.dragFormat': 'TXT-Format, max. 500 KB',
+                'form.voice': 'Stimme auswählen',
+                'form.speed': 'Geschwindigkeit',
+                'form.speedVerySlow': '🐌 Sehr langsam',
+                'form.speedSlow': '🚶 Langsam',
+                'form.speedNormal': '⚡ Normal',
+                'form.speedFast': '🏃 Schnell',
+                'form.speedVeryFast': '🚀 Sehr schnell',
+                'form.speedExtreme': '💨 Extrem',
+                'form.pitch': 'Tonhöhe',
+                'form.pitchVeryLow': '📉 Sehr tief',
+                'form.pitchLow': '📊 Tief',
+                'form.pitchNormal': '🎵 Normal',
+                'form.pitchHigh': '📈 Hoch',
+                'form.pitchVeryHigh': '🎶 Sehr hoch',
+                'form.style': 'Sprachstil',
+                'form.styleGeneral': '🎭 Allgemein',
+                'form.styleAssistant': '🤖 Assistent',
+                'form.styleChat': '💬 Chat',
+                'form.styleCustomer': '📞 Kundenservice',
+                'form.styleNews': '📺 Nachrichten',
+                'form.styleAffectionate': '💕 Zärtlich',
+                'form.styleCalm': '😌 Ruhig',
+                'form.styleCheerful': '😊 Fröhlich',
+                'form.styleGentle': '🌸 Sanft',
+                'form.styleLyrical': '🎼 Lyrisch',
+                'form.styleSerious': '🎯 Ernst',
+                'form.generate': 'Sprache generieren',
+                'form.loading': 'Sprache wird generiert, bitte warten...',
+                'form.download': 'Audio herunterladen'
             },
             ru: {
                 'page.title': 'VoiceTTS - ИИ-платформа обработки голоса',
@@ -1087,11 +1340,67 @@ const HTML_PAGE = `
                 'header.feature3': 'Совершенно Бесплатно',
                 'header.feature4': 'Поддержка Загрузки',
                 'mode.tts': 'Текст в Речь',
-                'mode.transcription': 'Речь в Текст'
+                'mode.transcription': 'Речь в Текст',
+                'form.inputMethod': 'Метод ввода',
+                'form.manualInput': 'Ручной ввод',
+                'form.uploadFile': 'Загрузить файл',
+                'form.inputText': 'Введите текст',
+                'form.textPlaceholder': 'Введите текст для преобразования в речь...',
+                'form.uploadTxt': 'Загрузить TXT файл',
+                'form.dragHint': 'Перетащите txt файл сюда или нажмите для выбора',
+                'form.dragFormat': 'Формат TXT, макс. 500 КБ',
+                'form.voice': 'Выбор голоса',
+                'form.speed': 'Скорость',
+                'form.speedVerySlow': '🐌 Очень медленно',
+                'form.speedSlow': '🚶 Медленно',
+                'form.speedNormal': '⚡ Нормально',
+                'form.speedFast': '🏃 Быстро',
+                'form.speedVeryFast': '🚀 Очень быстро',
+                'form.speedExtreme': '💨 Экстремально',
+                'form.pitch': 'Тон',
+                'form.pitchVeryLow': '📉 Очень низкий',
+                'form.pitchLow': '📊 Низкий',
+                'form.pitchNormal': '🎵 Нормальный',
+                'form.pitchHigh': '📈 Высокий',
+                'form.pitchVeryHigh': '🎶 Очень высокий',
+                'form.style': 'Стиль речи',
+                'form.styleGeneral': '🎭 Общий',
+                'form.styleAssistant': '🤖 Ассистент',
+                'form.styleChat': '💬 Чат',
+                'form.styleCustomer': '📞 Служба поддержки',
+                'form.styleNews': '📺 Новости',
+                'form.styleAffectionate': '💕 Ласковый',
+                'form.styleCalm': '😌 Спокойный',
+                'form.styleCheerful': '😊 Весёлый',
+                'form.styleGentle': '🌸 Нежный',
+                'form.styleLyrical': '🎼 Лирический',
+                'form.styleSerious': '🎯 Серьёзный',
+                'form.generate': 'Создать речь',
+                'form.loading': 'Генерация речи, пожалуйста, подождите...',
+                'form.download': 'Скачать аудио'
             }
         };
 
         // 国际化功能
+        // 翻译文本（通过 Workers 后端代理，无需翻墙）
+        async function translateText(text, targetLang) {
+            if (!text || !text.trim()) return text;
+            try {
+                const resp = await fetch('/v1/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, target: targetLang })
+                });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    return data.translated || text;
+                }
+            } catch (e) {
+                console.error('翻译错误:', e);
+            }
+            return text;
+        }
+        
         function detectLanguage() {
             // 检测浏览器语言
             const browserLang = navigator.language || navigator.userLanguage;
@@ -1123,12 +1432,21 @@ const HTML_PAGE = `
 
         function applyTranslations() {
             const langData = translations[currentLanguage];
+            if (!langData) return;
             
-            // 更新所有带有 data-i18n 属性的元素
+            // 更新所有带有 data-i18n 属性的元素（包括 select option）
             document.querySelectorAll('[data-i18n]').forEach(element => {
                 const key = element.getAttribute('data-i18n');
                 if (langData[key]) {
                     element.textContent = langData[key];
+                }
+            });
+            
+            // 更新 placeholder
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-i18n-placeholder');
+                if (langData[key]) {
+                    element.setAttribute('placeholder', langData[key]);
                 }
             });
             
@@ -1336,8 +1654,36 @@ const HTML_PAGE = `
                 
                 if (currentInputMethod === 'text') {
                     // 手动输入文本
-                    const text = document.getElementById('text').value;
+                    let text = document.getElementById('text').value;
                     textLength = text.length;
+                    
+                    // 自动翻译：根据语音语言翻译文本
+                    const voiceLang = voice.substring(0, 5); // e.g. "zh-CN", "en-US"
+                    const voiceLangShort = voice.split('-')[0]; // e.g. "zh", "en"
+                    const targetLangMap = {
+                        'zh-CN': 'zh', 'zh-TW': 'zh-TW',
+                        'en-US': 'en', 'en-GB': 'en', 'en-AU': 'en',
+                        'ja-JP': 'ja', 'ko-KR': 'ko', 'fr-FR': 'fr', 'fr-CA': 'fr',
+                        'de-DE': 'de', 'es-ES': 'es', 'es-MX': 'es',
+                        'ru-RU': 'ru', 'vi-VN': 'vi', 'ms-MY': 'ms', 'th-TH': 'th'
+                    };
+                    const targetLang = targetLangMap[voiceLang] || voiceLangShort;
+                    
+                    // 如果选择的不是中文语音，自动翻译文本到对应语言
+                    if (targetLang !== 'zh') {
+                        try {
+                            loadingText.textContent = '正在翻译文本...';
+                            progressInfo.textContent = '文本长度: ' + textLength + ' 字符';
+                            const translatedText = await translateText(text, targetLang);
+                            if (translatedText && translatedText !== text) {
+                                text = translatedText;
+                                loadingText.textContent = '翻译完成，正在生成语音...';
+                            }
+                        } catch (translateErr) {
+                            console.log('翻译失败，使用原始文本:', translateErr);
+                            // 翻译失败继续使用原始文本
+                        }
+                    }
                     
                     // 根据文本长度显示不同的提示
                     if (textLength > 3000) {
@@ -1495,6 +1841,21 @@ async function handleRequest(request) {
                 ...makeCORSHeaders()
             }
         });
+    }
+
+    if (path === "/v1/translate") {
+        try {
+            const { text, target } = await request.json();
+            const translated = await translateWithMicrosoft(text, target);
+            return new Response(JSON.stringify({ translated }), {
+                headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+            });
+        } catch (error) {
+            return new Response(JSON.stringify({ error: error.message }), {
+                status: 500,
+                headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+            });
+        }
     }
 
     if (path === "/v1/audio/speech") {
@@ -1908,7 +2269,31 @@ async function getEndpoint() {
     }
 }
 
-
+// Microsoft Translator API (free, via Workers proxy — not blocked by GFW)
+async function translateWithMicrosoft(text, targetLang) {
+    if (!text || !text.trim()) return text;
+    try {
+        const endpoint = await getEndpoint();
+        const url = 'https://' + endpoint.r + '.translate.microsoft.com/translate?api-version=3.0&to=' + targetLang;
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + endpoint.t,
+                'Content-Type': 'application/json; charset=utf-8',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            },
+            body: JSON.stringify([{ Text: text }])
+        });
+        if (!response.ok) throw new Error('translate failed: ' + response.status);
+        const data = await response.json();
+        if (data && data[0] && data[0].translations && data[0].translations[0]) {
+            return data[0].translations[0].text;
+        }
+    } catch (error) {
+        console.error('Microsoft translate failed:', error);
+    }
+    return text;
+}
 
 function makeCORSHeaders() {
     return {
