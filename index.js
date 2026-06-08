@@ -15,6 +15,8 @@ const HTML_PAGE = `
     <title data-i18n="page.title">VoiceTTS - AI-Powered Voice Processing Platform</title>
     <meta name="description" content="" data-i18n-content="page.description">
     <meta name="keywords" content="" data-i18n-content="page.keywords">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6575743893665209"
+     crossorigin="anonymous"></script>
     <style>
         :root {
             --primary-color: #2563eb;
