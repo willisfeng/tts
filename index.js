@@ -622,6 +622,18 @@ const HTML_PAGE = `
     </style>
 </head>
 <body>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6575743893665209"
+     crossorigin="anonymous"></script>
+<!-- tts -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-6575743893665209"
+     data-ad-slot="7226948003"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
     <!-- 语言切换器 -->
     <div class="language-switcher">
         <div class="language-btn" id="languageBtn">
