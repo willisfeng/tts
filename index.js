@@ -644,10 +644,10 @@ const HTML_PAGE = `
         .paywall-desc { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
         .paywall-price { font-size: 2.5rem; font-weight: 800; color: var(--primary-color); margin-bottom: 4px; }
         .paywall-price-sub { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; }
-        .paywall-price-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .paywall-price-item { background: var(--background-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 16px; text-align: center; min-width: 100px; }
-        .paywall-price-item .price-label { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2px; }
-        .paywall-price-item .price-value { display: block; font-size: 1.1rem; font-weight: 700; color: var(--primary-color); }
+        .paywall-price-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .paywall-price-item { background: var(--background-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px 10px; text-align: center; }
+        .paywall-price-item .price-label { display: block; font-size: 0.85rem; color: var(--text-secondary); }
+        .paywall-price-item .price-value { display: block; font-size: 1.15rem; font-weight: 700; color: var(--primary-color); margin-top: 2px; }
         .paywall-input {
             width: 100%;
             padding: 12px 16px;
@@ -1740,12 +1740,49 @@ async function getAllCodeRecords(env) {
         try {
             const list = await kv.list({ prefix: 'code:' });
             const records = [];
+            const seen = new Set();
             for (const key of list.keys) {
                 try {
                     const val = await kv.get(key.name);
-                    if (val) records.push(JSON.parse(val));
+                    if (val) {
+                        const rec = JSON.parse(val);
+                        records.push(rec);
+                        seen.add(rec.code);
+                    }
                 } catch (e) {}
             }
+            // 回填旧激活码：扫描 used: 前缀，补上没有 code: 记录的旧码
+            try {
+                const usedList = await kv.list({ prefix: 'used:' });
+                for (const key of usedList.keys) {
+                    const code = key.name.replace('used:', '');
+                    if (!seen.has(code)) {
+                        const usedAt = await kv.get(key.name);
+                        // 从激活码中解析有效期信息
+                        const parts = code.split('-');
+                        const expiry = parseInt(parts[parts.length - 2], 36) || 0;
+                        records.push({
+                            code,
+                            days: null,
+                            createdAt: expiry ? expiry - 30 * 24 * 3600 * 1000 : null,
+                            expiry: expiry || null,
+                            used: true,
+                            usedAt: usedAt ? parseInt(usedAt) : null
+                        });
+                        seen.add(code);
+                        // 回填 code: 记录，下次就能正常显示
+                        const backfillData = {
+                            code,
+                            days: null,
+                            createdAt: expiry ? expiry - 30 * 24 * 3600 * 1000 : Date.now(),
+                            expiry: expiry || null,
+                            used: true,
+                            usedAt: usedAt ? parseInt(usedAt) : null
+                        };
+                        await kv.put('code:' + code, JSON.stringify(backfillData)).catch(() => {});
+                    }
+                }
+            } catch (e) {}
             return records;
         } catch (e) {}
     }
@@ -1891,7 +1928,8 @@ async function handleRequest(request, env) {
 
     // 管理后台 - 生成激活码
     if (path === "/admin") {
-        const adminPassword = 'admintest'; // 请修改为你自己的管理密码
+        const DEFAULT_ADMIN_PASSWORD = 'admintest';
+        const adminPassword = (await kvGet(env, 'admin:password')) || DEFAULT_ADMIN_PASSWORD;
         const url = new URL(request.url);
         const pwd = url.searchParams.get('pwd') || '';
         
@@ -1926,8 +1964,34 @@ async function handleRequest(request, env) {
             });
         }
 
-        // 获取激活码列表 API
+        // 修改密码 API
         const adminUrl = new URL(request.url);
+        if (adminUrl.searchParams.get('action') === 'change-password') {
+            if (request.method !== 'POST') {
+                return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+                    status: 405, headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+                });
+            }
+            const body = await request.json().catch(() => ({}));
+            const oldPwd = body.oldPassword || '';
+            const newPwd = body.newPassword || '';
+            if (!newPwd || newPwd.length < 4) {
+                return new Response(JSON.stringify({ error: '新密码至少4位' }), {
+                    headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+                });
+            }
+            if (oldPwd !== adminPassword) {
+                return new Response(JSON.stringify({ error: '旧密码不正确' }), {
+                    headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+                });
+            }
+            await kvPut(env, 'admin:password', newPwd);
+            return new Response(JSON.stringify({ success: true }), {
+                headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+            });
+        }
+
+        // 获取激活码列表 API
         if (adminUrl.searchParams.get('action') === 'list') {
             const allCodes = await getAllCodeRecords(env);
             return new Response(JSON.stringify(allCodes), {
@@ -1966,6 +2030,15 @@ async function handleRequest(request, env) {
             .stat-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 20px;text-align:center}
             .stat-num{font-size:1.5rem;font-weight:700;color:#1a1a2e}
             .stat-label{font-size:.75rem;color:#64748b;margin-top:2px}
+            .toolbar{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+            .search-input{padding:8px 12px;border:2px solid #e0e0e0;border-radius:8px;font-size:.9rem;width:220px}
+            .search-input:focus{border-color:#2563eb;outline:none}
+            .pagination{display:flex;gap:8px;justify-content:center;align-items:center;margin-top:16px}
+            .page-btn{padding:6px 14px;border:1px solid #e2e8f0;border-radius:6px;background:#fff;cursor:pointer;font-size:.85rem;color:#475569}
+            .page-btn:hover{background:#f1f5f9}
+            .page-btn.active{background:#2563eb;color:#fff;border-color:#2563eb}
+            .page-btn:disabled{opacity:0.4;cursor:default}
+            .page-info{font-size:.85rem;color:#64748b}
         </style></head><body><div class="container"><h1>🔑 激活码管理</h1>
             <div class="section">
                 <div class="section-title">📦 生成激活码</div>
@@ -1978,8 +2051,20 @@ async function handleRequest(request, env) {
                 <div class="result" id="result"></div>
             </div>
             <div class="section">
+                <div class="section-title">🔒 修改管理密码</div>
+                <div class="form">
+                    <input type="password" class="input" id="oldPassword" placeholder="旧密码" style="width:160px">
+                    <input type="password" class="input" id="newPassword" placeholder="新密码（至少4位）" style="width:200px">
+                    <button class="btn" id="changePwdBtn">修改密码</button>
+                </div>
+                <div id="pwdMsg" style="font-size:.85rem;margin-top:4px"></div>
+            </div>
+            <div class="section">
                 <div class="section-title">📋 激活码列表</div>
                 <div class="stats" id="stats"></div>
+                <div class="toolbar">
+                    <input type="text" class="search-input" id="searchInput" placeholder="搜索激活码...">
+                </div>
                 <div class="tabs">
                     <button class="tab active" data-tab="all">全部</button>
                     <button class="tab" data-tab="unused">未使用</button>
@@ -1987,6 +2072,7 @@ async function handleRequest(request, env) {
                     <button class="tab" data-tab="expired">已过期</button>
                 </div>
                 <div id="codeTable"></div>
+                <div class="pagination" id="pagination"></div>
                 <button class="btn btn-sm" id="refreshBtn" style="margin-top:12px">🔄 刷新列表</button>
             </div>
             <div class="info">${getKV(env) ? '✅ 使用 KV 持久化存储' : '⚠️ 内存存储，重启后记录丢失。建议绑定 KV。'}</div>
@@ -1995,6 +2081,9 @@ async function handleRequest(request, env) {
             const pwd = '${encodeURIComponent(pwd)}';
             let allCodes = [];
             let currentTab = 'all';
+            let currentPage = 1;
+            const PAGE_SIZE = 15;
+            let searchKeyword = '';
 
             async function loadList() {
                 try {
@@ -2004,6 +2093,7 @@ async function handleRequest(request, env) {
                     allCodes = [];
                 }
                 renderStats();
+                currentPage = 1;
                 renderTable();
             }
 
@@ -2025,18 +2115,32 @@ async function handleRequest(request, env) {
                     '<div class="stat-item"><div class="stat-num" style="color:#d97706">' + expired + '</div><div class="stat-label">已过期</div></div>';
             }
 
-            function renderTable() {
+            function getFilteredList() {
                 let list = allCodes;
                 if (currentTab === 'unused') list = allCodes.filter(c => !c.used && Date.now() <= c.expiry);
                 else if (currentTab === 'used') list = allCodes.filter(c => c.used);
                 else if (currentTab === 'expired') list = allCodes.filter(c => !c.used && Date.now() > c.expiry);
+                if (searchKeyword) {
+                    const kw = searchKeyword.toLowerCase();
+                    list = list.filter(c => c.code.toLowerCase().includes(kw));
+                }
+                return list;
+            }
 
-                if (list.length === 0) {
+            function renderTable() {
+                const filteredList = getFilteredList();
+                const totalPages = Math.ceil(filteredList.length / PAGE_SIZE) || 1;
+                if (currentPage > totalPages) currentPage = totalPages;
+                const start = (currentPage - 1) * PAGE_SIZE;
+                const pageList = filteredList.slice(start, start + PAGE_SIZE);
+
+                if (filteredList.length === 0) {
                     document.getElementById('codeTable').innerHTML = '<div class="empty">暂无记录</div>';
+                    document.getElementById('pagination').innerHTML = '';
                     return;
                 }
 
-                const rows = list.map(c => {
+                const rows = pageList.map(c => {
                     const status = getStatus(c);
                     const statusText = status === 'unused' ? '未使用' : status === 'used' ? '已使用' : '已过期';
                     const statusClass = status === 'unused' ? 'status-unused' : status === 'used' ? 'status-used' : 'status-expired';
@@ -2055,7 +2159,35 @@ async function handleRequest(request, env) {
 
                 document.getElementById('codeTable').innerHTML = 
                     '<table><thead><tr><th>激活码</th><th>期限</th><th>创建时间</th><th>有效期至</th><th>状态</th><th>使用时间</th></tr></thead><tbody>' + rows + '</tbody></table>';
+
+                // 翻页
+                let pageHtml = '<span class="page-info">共 ' + filteredList.length + ' 条，' + totalPages + ' 页</span>';
+                pageHtml += '<button class="page-btn" ' + (currentPage <= 1 ? 'disabled' : '') + ' onclick="goPage(' + (currentPage - 1) + ')">上一页</button>';
+                for (let i = 1; i <= totalPages; i++) {
+                    if (totalPages <= 7 || i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                        pageHtml += '<button class="page-btn' + (i === currentPage ? ' active' : '') + '" onclick="goPage(' + i + ')">' + i + '</button>';
+                    } else if (i === currentPage - 2 || i === currentPage + 2) {
+                        pageHtml += '<span class="page-info">...</span>';
+                    }
+                }
+                pageHtml += '<button class="page-btn" ' + (currentPage >= totalPages ? 'disabled' : '') + ' onclick="goPage(' + (currentPage + 1) + ')">下一页</button>';
+                document.getElementById('pagination').innerHTML = pageHtml;
             }
+
+            window.goPage = function(p) {
+                const totalPages = Math.ceil(getFilteredList().length / PAGE_SIZE) || 1;
+                if (p < 1 || p > totalPages) return;
+                currentPage = p;
+                renderTable();
+                document.querySelector('.container').scrollIntoView({ behavior: 'smooth' });
+            };
+
+            // 搜索
+            document.getElementById('searchInput').addEventListener('input', function() {
+                searchKeyword = this.value.trim();
+                currentPage = 1;
+                renderTable();
+            });
 
             // 切换 Tab
             document.querySelectorAll('.tab').forEach(tab => {
@@ -2063,6 +2195,7 @@ async function handleRequest(request, env) {
                     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                     this.classList.add('active');
                     currentTab = this.dataset.tab;
+                    currentPage = 1;
                     renderTable();
                 });
             });
@@ -2094,6 +2227,39 @@ async function handleRequest(request, env) {
                 }
                 btn.disabled = false;
                 btn.textContent = '生成激活码';
+            });
+
+            // 修改密码
+            document.getElementById('changePwdBtn').addEventListener('click', async function() {
+                const btn = this;
+                const oldPassword = document.getElementById('oldPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const msg = document.getElementById('pwdMsg');
+                if (!newPassword || newPassword.length < 4) {
+                    msg.innerHTML = '<span style="color:#dc2626">新密码至少需要4位</span>';
+                    return;
+                }
+                btn.disabled = true;
+                btn.textContent = '修改中...';
+                try {
+                    const resp = await fetch('/admin?pwd=' + pwd + '&action=change-password', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ oldPassword, newPassword })
+                    });
+                    const data = await resp.json();
+                    if (data.success) {
+                        msg.innerHTML = '<span style="color:#059669">✅ 密码修改成功，下次登录请使用新密码</span>';
+                        document.getElementById('oldPassword').value = '';
+                        document.getElementById('newPassword').value = '';
+                    } else {
+                        msg.innerHTML = '<span style="color:#dc2626">❌ ' + (data.error || '修改失败') + '</span>';
+                    }
+                } catch(e) {
+                    msg.innerHTML = '<span style="color:#dc2626">修改失败，请重试</span>';
+                }
+                btn.disabled = false;
+                btn.textContent = '修改密码';
             });
 
             // 刷新
