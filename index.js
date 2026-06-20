@@ -1416,11 +1416,11 @@ const HTML_PAGE = `
             checkLicense().then(info => {
                 if (info && info.valid) {
                     hidePaywall();
-                    updateLicenseBadge(info.expiry);
+                    updateLicenseBadge(info.expiry, info.code);
                 } else if (info && info.expired) {
                     // 已过期，显示充值页面，badge 提示过期
                     showPaywall();
-                    updateLicenseBadge(info.expiry);
+                    updateLicenseBadge(info.expiry, info.code);
                     document.getElementById('licenseBadge').classList.remove('hidden');
                 } else {
                     showPaywall();
@@ -1569,21 +1569,25 @@ const HTML_PAGE = `
             document.getElementById('licenseBadge').classList.remove('hidden');
         }
 
-        function updateLicenseBadge(expiry) {
+        function updateLicenseBadge(expiry, code) {
             const badge = document.getElementById('licenseBadge');
             if (expiry) {
                 const d = new Date(expiry);
                 const dateStr = d.toLocaleDateString('zh-CN');
                 const remaining = Math.ceil((expiry - Date.now()) / (24 * 3600 * 1000));
                 if (remaining > 0) {
-                    badge.innerHTML = '✅ 已激活 · 到期：' + dateStr + '（剩余 ' + remaining + ' 天）';
+                    badge.innerHTML = '✅ 已激活 · 到期：' + dateStr + '（剩余 ' + remaining + ' 天）' + (code ? ' · 激活码：' + code : '');
                     badge.style.background = 'var(--success-color)';
                 } else {
-                    badge.innerHTML = '⚠️ 已过期 · ' + dateStr;
+                    badge.innerHTML = '⚠️ 已过期 · ' + dateStr + (code ? ' · 激活码：' + code : '');
                     badge.style.background = '#f59e0b';
                 }
+            } else if (code) {
+                badge.innerHTML = '✅ 已激活 · 激活码：' + code;
+                badge.style.background = 'var(--success-color)';
             } else {
                 badge.innerHTML = '✅ 已激活';
+                badge.style.background = 'var(--success-color)';
             }
         }
 
@@ -1597,7 +1601,7 @@ const HTML_PAGE = `
                     body: JSON.stringify({ token, deviceId: getDeviceId() })
                 });
                 const data = await resp.json();
-                return { valid: data.valid, expiry: data.expiry, expired: data.expired || false };
+                return { valid: data.valid, expiry: data.expiry, expired: data.expired || false, code: data.code || null };
             } catch (e) {
                 console.error('License check failed:', e);
             }
@@ -1639,7 +1643,7 @@ const HTML_PAGE = `
                         // 延迟隐藏 paywall，让用户看到成功信息
                         setTimeout(() => {
                             hidePaywall();
-                            updateLicenseBadge(data.expiry);
+                            updateLicenseBadge(data.expiry, code);
                         }, 1500);
                     } else {
                         paywallError.textContent = translations[currentLanguage][data.error || 'paywall.invalid'];
@@ -2053,7 +2057,7 @@ async function loadLicenseToken(env, token) {
 
 function issueLicenseToken(deviceId) {
     const token = 'lic-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
-    memDeviceTokens.set(token, { deviceId, createdAt: Date.now() });
+    // 不在内存中预写不完整信息，由 saveLicenseToken 统一写入
     return token;
 }
 
@@ -2143,7 +2147,7 @@ async function handleRequest(request, env) {
                     headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
                 });
             }
-            return new Response(JSON.stringify({ valid: true, expiry: info.expiry || null }), {
+            return new Response(JSON.stringify({ valid: true, expiry: info.expiry || null, code: info.code || null }), {
                 headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
             });
         } catch (error) {
