@@ -2352,7 +2352,8 @@ async function handleRequest(request, env) {
             <div class="info">${getKV(env) ? '✅ 使用 KV 持久化存储' : '⚠️ 内存存储，重启后记录丢失。建议绑定 KV。'}</div>
         </div>
         <script>
-            const pwd = '${encodeURIComponent(pwd)}';
+            const pwd = '${pwd.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}';
+            const epwd = encodeURIComponent(pwd);
             let allCodes = [];
             let currentTab = 'all';
             let currentPage = 1;
@@ -2361,7 +2362,7 @@ async function handleRequest(request, env) {
 
             async function loadList() {
                 try {
-                    const resp = await fetch('/admin?pwd=' + pwd + '&action=list');
+                    const resp = await fetch('/admin?pwd=' + epwd + '&action=list');
                     allCodes = await resp.json();
                 } catch(e) {
                     allCodes = [];
@@ -2484,7 +2485,7 @@ async function handleRequest(request, env) {
                 const days = parseInt(document.getElementById('days').value) || ${LICENSE_VALIDITY_DAYS};
                 const count = parseInt(document.getElementById('count').value) || 1;
                 try {
-                    const resp = await fetch('/admin?pwd=' + pwd, {
+                    const resp = await fetch('/admin?pwd=' + epwd, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ prefix, count, days })
@@ -2517,7 +2518,7 @@ async function handleRequest(request, env) {
                 btn.disabled = true;
                 btn.textContent = '修改中...';
                 try {
-                    const resp = await fetch('/admin?pwd=' + pwd + '&action=change-password', {
+                    const resp = await fetch('/admin?pwd=' + epwd + '&action=change-password', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ oldPassword, newPassword })
@@ -2541,7 +2542,7 @@ async function handleRequest(request, env) {
             window.deleteCode = async function(code) {
                 if (!confirm('确定要删除激活码「' + code + '」吗？此操作不可恢复。')) return;
                 try {
-                    const resp = await fetch('/admin?pwd=' + pwd + '&action=delete-code', {
+                    const resp = await fetch('/admin?pwd=' + epwd + '&action=delete-code', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ code: code })
