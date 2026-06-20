@@ -16,8 +16,8 @@ name = "tts-voice-magic-staging"
 # KV 存储 - 持久化激活码和许可证数据
 [[kv_namespaces]]
 binding = "LICENSE_KV"
-id = "tts-license-kv"
-preview_id = "tts-license-kv-preview"
+id = "d0272f26caf64140b6685f478aee6369"
+preview_id = "d0272f26caf64140b6685f478aee6369"
 
 # 如果需要 D1 数据库（可选）
 # [[d1_databases]]
