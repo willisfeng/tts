@@ -622,62 +622,209 @@ const HTML_PAGE = `
         .paywall-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(6px);
+            background: linear-gradient(135deg, rgba(15,23,42,0.85) 0%, rgba(30,41,59,0.9) 100%);
+            backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
+            padding: 20px;
         }
         .paywall-overlay.hidden { display: none; }
         .paywall-card {
             background: var(--surface-color);
-            border-radius: var(--radius-xl);
-            padding: 40px 32px;
-            max-width: 440px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
-        }
-        .paywall-icon { font-size: 48px; margin-bottom: 16px; }
-        .paywall-title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
-        .paywall-desc { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
-        .paywall-price { font-size: 2.5rem; font-weight: 800; color: var(--primary-color); margin-bottom: 4px; }
-        .paywall-price-sub { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; }
-        .paywall-price-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .paywall-price-item { background: var(--background-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px 10px; text-align: center; }
-        .paywall-price-item .price-label { display: block; font-size: 0.85rem; color: var(--text-secondary); }
-        .paywall-price-item .price-value { display: block; font-size: 1.15rem; font-weight: 700; color: var(--primary-color); margin-top: 2px; }
-        .paywall-input {
+            border-radius: 20px;
+            padding: 44px 36px;
+            max-width: 460px;
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid var(--border-color);
-            border-radius: var(--radius-md);
-            font-size: 1rem;
             text-align: center;
-            letter-spacing: 2px;
-            outline: none;
-            transition: border-color 0.2s;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.08);
+            animation: paywallIn 0.4s ease-out;
+        }
+        @keyframes paywallIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .paywall-header {
+            margin-bottom: 28px;
+        }
+        .paywall-icon { 
+            width: 72px; height: 72px;
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 36px;
+            box-shadow: 0 4px 15px rgba(37,99,235,0.15);
+        }
+        .paywall-title { 
+            font-size: 1.6rem; 
+            font-weight: 800; 
+            color: var(--text-primary); 
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+        .paywall-desc { 
+            font-size: 0.9rem; 
+            color: var(--text-secondary); 
+            margin-bottom: 0; 
+            line-height: 1.6; 
+        }
+        .paywall-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 24px 0;
+        }
+        .paywall-section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
             margin-bottom: 12px;
         }
-        .paywall-input:focus { border-color: var(--primary-color); }
-        .paywall-btn {
-            width: 100%;
-            padding: 12px;
+        .paywall-price-list { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 8px; 
+            margin-bottom: 28px; 
+        }
+        .paywall-price-item { 
+            background: var(--background-color); 
+            border: 2px solid transparent; 
+            border-radius: var(--radius-lg); 
+            padding: 14px 10px; 
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .paywall-price-item:hover {
+            border-color: var(--primary-color);
+            background: #f0f7ff;
+        }
+        .paywall-price-item .price-label { 
+            display: block; 
+            font-size: 0.8rem; 
+            color: var(--text-secondary); 
+            font-weight: 500;
+        }
+        .paywall-price-item .price-value { 
+            display: block; 
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            color: var(--primary-color); 
+            margin-top: 4px; 
+        }
+        .paywall-price-item.featured {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, #eff6ff, #f0f7ff);
+            position: relative;
+        }
+        .paywall-price-item.featured::before {
+            content: '推荐';
+            position: absolute;
+            top: -8px;
+            right: -4px;
             background: var(--primary-color);
             color: #fff;
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        .paywall-input-group {
+            position: relative;
+            margin-bottom: 12px;
+        }
+        .paywall-input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+        .paywall-input {
+            width: 100%;
+            padding: 13px 16px 13px 42px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            font-size: 0.95rem;
+            letter-spacing: 1.5px;
+            outline: none;
+            transition: all 0.2s;
+            background: var(--background-color);
+        }
+        .paywall-input:focus { 
+            border-color: var(--primary-color); 
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(37,99,235,0.08);
+        }
+        .paywall-input::placeholder {
+            letter-spacing: 0;
+            color: #94a3b8;
+        }
+        .paywall-btn {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+            color: #fff;
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: var(--radius-lg);
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(37,99,235,0.3);
         }
-        .paywall-btn:hover { background: var(--primary-hover); }
-        .paywall-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .paywall-error { color: var(--error-color); font-size: 0.875rem; margin-top: 8px; min-height: 20px; }
-        .paywall-contact { margin-top: 16px; font-size: 0.85rem; color: var(--text-secondary); }
-        .paywall-contact a { color: var(--primary-color); text-decoration: none; }
+        .paywall-btn:hover { 
+            background: linear-gradient(135deg, var(--primary-hover), #2563eb);
+            box-shadow: 0 6px 20px rgba(37,99,235,0.4);
+            transform: translateY(-1px);
+        }
+        .paywall-btn:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed; 
+            transform: none;
+            box-shadow: none;
+        }
+        .paywall-error { 
+            color: var(--error-color); 
+            font-size: 0.85rem; 
+            margin-top: 10px; 
+            min-height: 20px;
+        }
+        .paywall-contact { 
+            margin-top: 24px; 
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.82rem; 
+            color: var(--text-secondary); 
+        }
+        .paywall-contact a { 
+            color: var(--primary-color); 
+            text-decoration: none; 
+            font-weight: 500;
+        }
+        .paywall-contact .contact-qr {
+            width: 120px;
+            height: 120px;
+            background: var(--background-color);
+            border-radius: var(--radius-md);
+            margin: 12px auto 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+        }
+        .paywall-contact .contact-qr img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: var(--radius-md);
+        }
         .license-badge {
             position: fixed;
             top: 12px;
@@ -739,17 +886,24 @@ const HTML_PAGE = `
     <!-- 付费墙 -->
     <div class="paywall-overlay" id="paywallOverlay">
         <div class="paywall-card">
-            <div class="paywall-icon">🔐</div>
-            <div class="paywall-title" data-i18n="paywall.title">激活您的使用权限</div>
-            <div class="paywall-desc" data-i18n="paywall.desc">VoiceTTS 是付费服务，请输入您的激活码以解锁全部功能</div>
+            <div class="paywall-header">
+                <div class="paywall-icon">🔐</div>
+                <div class="paywall-title" data-i18n="paywall.title">激活您的使用权限</div>
+                <div class="paywall-desc" data-i18n="paywall.desc">VoiceTTS 是付费服务，请输入您的激活码以解锁全部功能</div>
+            </div>
+            <div class="paywall-section-label">价格方案</div>
             <div class="paywall-price-list">
                 <div class="paywall-price-item"><span class="price-label">3天免费</span></div>
                 <div class="paywall-price-item"><span class="price-label">7天</span><span class="price-value">¥9.9</span></div>
-                <div class="paywall-price-item"><span class="price-label">1个月</span><span class="price-value">¥25</span></div>
+                <div class="paywall-price-item featured"><span class="price-label">1个月</span><span class="price-value">¥25</span></div>
                 <div class="paywall-price-item"><span class="price-label">3个月</span><span class="price-value">¥60</span></div>
             </div>
-            <input type="text" class="paywall-input" id="licenseKeyInput" placeholder="请输入激活码" maxlength="64" autocomplete="off">
-            <button class="paywall-btn" id="activateBtn" data-i18n="paywall.btn">激活</button>
+            <div class="paywall-section-label">输入激活码</div>
+            <div class="paywall-input-group">
+                <span class="paywall-input-icon">🔑</span>
+                <input type="text" class="paywall-input" id="licenseKeyInput" placeholder="请输入激活码" maxlength="64" autocomplete="off">
+            </div>
+            <button class="paywall-btn" id="activateBtn" data-i18n="paywall.btn">激 活</button>
             <div class="paywall-error" id="paywallError"></div>
             <div class="paywall-contact">
                 <p style="margin-bottom:8px;font-weight:600" data-i18n="paywall.contact">获取激活码请联系：</p>
@@ -1258,9 +1412,15 @@ const HTML_PAGE = `
             
 
             // 检查激活状态
-            checkLicense().then(valid => {
-                if (valid) {
+            checkLicense().then(info => {
+                if (info && info.valid) {
                     hidePaywall();
+                    updateLicenseBadge(info.expiry);
+                } else if (info && info.expired) {
+                    // 已过期，显示充值页面，badge 提示过期
+                    showPaywall();
+                    updateLicenseBadge(info.expiry);
+                    document.getElementById('licenseBadge').classList.remove('hidden');
                 } else {
                     showPaywall();
                 }
@@ -1408,23 +1568,39 @@ const HTML_PAGE = `
             document.getElementById('licenseBadge').classList.remove('hidden');
         }
 
+        function updateLicenseBadge(expiry) {
+            const badge = document.getElementById('licenseBadge');
+            if (expiry) {
+                const d = new Date(expiry);
+                const dateStr = d.toLocaleDateString('zh-CN');
+                const remaining = Math.ceil((expiry - Date.now()) / (24 * 3600 * 1000));
+                if (remaining > 0) {
+                    badge.innerHTML = '✅ 已激活 · 到期：' + dateStr + '（剩余 ' + remaining + ' 天）';
+                    badge.style.background = 'var(--success-color)';
+                } else {
+                    badge.innerHTML = '⚠️ 已过期 · ' + dateStr;
+                    badge.style.background = '#f59e0b';
+                }
+            } else {
+                badge.innerHTML = '✅ 已激活';
+            }
+        }
+
         async function checkLicense() {
             const token = getLicenseToken();
-            if (!token) return false;
+            if (!token) return null;
             try {
                 const resp = await fetch('/v1/check-license', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token, deviceId: getDeviceId() })
                 });
-                if (resp.ok) {
-                    const data = await resp.json();
-                    return data.valid;
-                }
+                const data = await resp.json();
+                return { valid: data.valid, expiry: data.expiry, expired: data.expired || false };
             } catch (e) {
                 console.error('License check failed:', e);
             }
-            return false;
+            return null;
         }
 
         // 激活按钮
@@ -1454,6 +1630,7 @@ const HTML_PAGE = `
                     if (resp.ok && data.success) {
                         localStorage.setItem('VoiceTTS-license', data.token);
                         hidePaywall();
+                        updateLicenseBadge(data.expiry);
                         alert(translations[currentLanguage]['paywall.success']);
                     } else {
                         paywallError.textContent = translations[currentLanguage][data.error || 'paywall.invalid'];
@@ -1574,6 +1751,12 @@ const HTML_PAGE = `
                 
                 if (!response.ok) {
                     const errorData = await response.json();
+                    const errType = errorData.error?.type || '';
+                    if (errType === 'license_expired' || errType === 'license_required') {
+                        showPaywall();
+                        updateLicenseBadge(errorData.error?.expiry);
+                        throw new Error(errorData.error?.message || '请先激活使用权限');
+                    }
                     throw new Error(errorData.error?.message || '生成失败');
                 }
                 
@@ -1698,8 +1881,8 @@ function verifyActivationCode(code) {
     if (computedSig !== providedSig) return { valid: false, reason: 'invalid' };
     // 检查有效期
     const expiry = parseInt(parts[parts.length - 2], 36);
-    if (Date.now() > expiry) return { valid: false, reason: 'expired' };
-    return { valid: true };
+    if (Date.now() > expiry) return { valid: false, reason: 'expired', expiry };
+    return { valid: true, expiry };
 }
 
 // 已使用的激活码和令牌（优先 KV，fallback 内存）
@@ -1818,9 +2001,11 @@ async function saveCodeRecord(env, code, days) {
     await kvPut(env, 'code:' + code, JSON.stringify(info));
 }
 
-async function saveLicenseToken(env, token, deviceId) {
-    memDeviceTokens.set(token, { deviceId, createdAt: Date.now() });
-    await kvPut(env, 'lic:' + token, JSON.stringify({ deviceId, createdAt: Date.now() }));
+async function saveLicenseToken(env, token, deviceId, expiry, code) {
+    const now = Date.now();
+    const info = { deviceId, createdAt: now, expiry: expiry || null, code: code || null };
+    memDeviceTokens.set(token, info);
+    await kvPut(env, 'lic:' + token, JSON.stringify(info));
 }
 
 async function loadLicenseToken(env, token) {
@@ -1899,9 +2084,10 @@ async function handleRequest(request, env) {
                 });
             }
             await markCodeUsed(env, code);
+            const expiry = result.expiry;
             const token = issueLicenseToken(deviceId);
-            await saveLicenseToken(env, token, deviceId);
-            return new Response(JSON.stringify({ success: true, token }), {
+            await saveLicenseToken(env, token, deviceId, expiry, code);
+            return new Response(JSON.stringify({ success: true, token, expiry }), {
                 headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
             });
         } catch (error) {
@@ -1915,8 +2101,19 @@ async function handleRequest(request, env) {
     if (path === "/v1/check-license") {
         try {
             const { token, deviceId } = await request.json();
-            const valid = await verifyLicenseToken(env, token, deviceId);
-            return new Response(JSON.stringify({ valid }), {
+            const info = await loadLicenseToken(env, token);
+            if (!info || info.deviceId !== deviceId) {
+                return new Response(JSON.stringify({ valid: false }), {
+                    headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+                });
+            }
+            // 检查是否到期
+            if (info.expiry && Date.now() > info.expiry) {
+                return new Response(JSON.stringify({ valid: false, expired: true, expiry: info.expiry }), {
+                    headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+                });
+            }
+            return new Response(JSON.stringify({ valid: true, expiry: info.expiry || null }), {
                 headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
             });
         } catch (error) {
@@ -1947,8 +2144,9 @@ async function handleRequest(request, env) {
             return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
         }
 
-        // 生成新激活码
-        if (request.method === 'POST') {
+        // 生成新激活码（无 action 参数或 action=generate 时）
+        const genUrl = new URL(request.url);
+        if (request.method === 'POST' && !genUrl.searchParams.get('action')) {
             const body = await request.json().catch(() => ({}));
             const prefix = body.prefix || 'VTTS';
             const count = body.count || 1;
@@ -1995,6 +2193,48 @@ async function handleRequest(request, env) {
         if (adminUrl.searchParams.get('action') === 'list') {
             const allCodes = await getAllCodeRecords(env);
             return new Response(JSON.stringify(allCodes), {
+                headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+            });
+        }
+
+        // 删除激活码 API
+        if (adminUrl.searchParams.get('action') === 'delete-code') {
+            if (request.method !== 'POST') {
+                return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+                    status: 405, headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+                });
+            }
+            const body = await request.json().catch(() => ({}));
+            const code = body.code;
+            if (!code) {
+                return new Response(JSON.stringify({ error: '缺少激活码' }), {
+                    status: 400, headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+                });
+            }
+            const kv = getKV(env);
+            if (kv) {
+                // 删除 code: 记录
+                await kv.delete('code:' + code).catch(() => {});
+                // 删除 used: 记录
+                await kv.delete('used:' + code).catch(() => {});
+                // 查找并删除关联的 lic: 记录（许可令牌）
+                try {
+                    const licList = await kv.list({ prefix: 'lic:' });
+                    for (const key of licList.keys) {
+                        const val = await kv.get(key.name);
+                        if (val) {
+                            try {
+                                const info = JSON.parse(val);
+                                // 检查该 license 是否与激活码关联（通过 deviceId 存储时记录 code）
+                                if (info.code === code) {
+                                    await kv.delete(key.name).catch(() => {});
+                                }
+                            } catch (e) {}
+                        }
+                    }
+                } catch (e) {}
+            }
+            return new Response(JSON.stringify({ success: true }), {
                 headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
             });
         }
@@ -2154,11 +2394,12 @@ async function handleRequest(request, env) {
                         '<td>' + expiryDate + '</td>' +
                         '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
                         '<td>' + usedDate + '</td>' +
+                        '<td><button class="btn btn-sm" style="background:#dc2626" onclick="deleteCode(\'' + c.code + '\')">删除</button></td>' +
                         '</tr>';
                 }).join('');
 
                 document.getElementById('codeTable').innerHTML = 
-                    '<table><thead><tr><th>激活码</th><th>期限</th><th>创建时间</th><th>有效期至</th><th>状态</th><th>使用时间</th></tr></thead><tbody>' + rows + '</tbody></table>';
+                    '<table><thead><tr><th>激活码</th><th>期限</th><th>创建时间</th><th>有效期至</th><th>状态</th><th>使用时间</th><th>操作</th></tr></thead><tbody>' + rows + '</tbody></table>';
 
                 // 翻页
                 let pageHtml = '<span class="page-info">共 ' + filteredList.length + ' 条，' + totalPages + ' 页</span>';
@@ -2262,6 +2503,26 @@ async function handleRequest(request, env) {
                 btn.textContent = '修改密码';
             });
 
+            // 删除激活码
+            window.deleteCode = async function(code) {
+                if (!confirm('确定要删除激活码「' + code + '」吗？此操作不可恢复。')) return;
+                try {
+                    const resp = await fetch('/admin?pwd=' + pwd + '&action=delete-code', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ code: code })
+                    });
+                    const data = await resp.json();
+                    if (data.success) {
+                        loadList();
+                    } else {
+                        alert('删除失败：' + (data.error || '未知错误'));
+                    }
+                } catch(e) {
+                    alert('删除失败，请重试');
+                }
+            };
+
             // 刷新
             document.getElementById('refreshBtn').addEventListener('click', loadList);
 
@@ -2283,8 +2544,14 @@ async function handleRequest(request, env) {
             // 许可证检查
             const licenseToken = request.headers.get('X-License-Token') || '';
             const deviceId = request.headers.get('X-Device-Id') || '';
-            if (!licenseToken || !await verifyLicenseToken(env, licenseToken, deviceId)) {
+            const licenseInfo = await loadLicenseToken(env, licenseToken);
+            if (!licenseInfo || licenseInfo.deviceId !== deviceId) {
                 return new Response(JSON.stringify({ error: { message: '请先激活使用权限', type: 'license_required' } }), {
+                    status: 403, headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+                });
+            }
+            if (licenseInfo.expiry && Date.now() > licenseInfo.expiry) {
+                return new Response(JSON.stringify({ error: { message: '您的使用权限已到期，请续费', type: 'license_expired' } }), {
                     status: 403, headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
                 });
             }
@@ -2753,8 +3020,14 @@ async function handleFileUpload(request, env) {
         const formData = await request.formData();
         const license = formData.get('license') || '';
         const deviceId = formData.get('deviceId') || '';
-        if (!license || !await verifyLicenseToken(env, license, deviceId)) {
+        const licenseInfo = await loadLicenseToken(env, license);
+        if (!licenseInfo || licenseInfo.deviceId !== deviceId) {
             return new Response(JSON.stringify({ error: { message: '请先激活使用权限', type: 'license_required' } }), {
+                status: 403, headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+            });
+        }
+        if (licenseInfo.expiry && Date.now() > licenseInfo.expiry) {
+            return new Response(JSON.stringify({ error: { message: '您的使用权限已到期，请续费', type: 'license_expired' } }), {
                 status: 403, headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
             });
         }
