@@ -2433,7 +2433,7 @@ async function handleRequest(request, env) {
                         '<td>' + expiryDate + '</td>' +
                         '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
                         '<td>' + usedDate + '</td>' +
-                        '<td><button class="btn btn-sm" style="background:#dc2626" onclick="deleteCode(\'' + c.code + '\')">删除</button></td>' +
+                        '<td><button class="btn btn-sm btn-delete" style="background:#dc2626" data-code="' + c.code.replace(/"/g, '&quot;') + '">删除</button></td>' +
                         '</tr>';
                 }).join('');
 
@@ -2542,8 +2542,12 @@ async function handleRequest(request, env) {
                 btn.textContent = '修改密码';
             });
 
-            // 删除激活码
-            window.deleteCode = async function(code) {
+            // 删除激活码（事件委托）
+            document.getElementById('codeTable').addEventListener('click', async function(e) {
+                const btn = e.target.closest('.btn-delete');
+                if (!btn) return;
+                const code = btn.getAttribute('data-code');
+                if (!code) return;
                 if (!confirm('确定要删除激活码「' + code + '」吗？此操作不可恢复。')) return;
                 try {
                     const resp = await fetch('/admin?pwd=' + epwd + '&action=delete-code', {
@@ -2560,7 +2564,7 @@ async function handleRequest(request, env) {
                 } catch(e) {
                     alert('删除失败，请重试');
                 }
-            };
+            });
 
             // 刷新
             document.getElementById('refreshBtn').addEventListener('click', loadList);
