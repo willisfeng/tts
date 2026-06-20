@@ -644,6 +644,10 @@ const HTML_PAGE = `
         .paywall-desc { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.6; }
         .paywall-price { font-size: 2.5rem; font-weight: 800; color: var(--primary-color); margin-bottom: 4px; }
         .paywall-price-sub { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 20px; }
+        .paywall-price-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .paywall-price-item { background: var(--background-color); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 16px; text-align: center; min-width: 100px; }
+        .paywall-price-item .price-label { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 2px; }
+        .paywall-price-item .price-value { display: block; font-size: 1.1rem; font-weight: 700; color: var(--primary-color); }
         .paywall-input {
             width: 100%;
             padding: 12px 16px;
@@ -738,8 +742,12 @@ const HTML_PAGE = `
             <div class="paywall-icon">🔐</div>
             <div class="paywall-title" data-i18n="paywall.title">激活您的使用权限</div>
             <div class="paywall-desc" data-i18n="paywall.desc">VoiceTTS 是付费服务，请输入您的激活码以解锁全部功能</div>
-            <div class="paywall-price">¥XX</div>
-            <div class="paywall-price-sub" data-i18n="paywall.sub">永久使用 · 一次付费</div>
+            <div class="paywall-price-list">
+                <div class="paywall-price-item"><span class="price-label">3天免费</span></div>
+                <div class="paywall-price-item"><span class="price-label">7天</span><span class="price-value">¥9.9</span></div>
+                <div class="paywall-price-item"><span class="price-label">1个月</span><span class="price-value">¥25</span></div>
+                <div class="paywall-price-item"><span class="price-label">3个月</span><span class="price-value">¥60</span></div>
+            </div>
             <input type="text" class="paywall-input" id="licenseKeyInput" placeholder="请输入激活码" maxlength="64" autocomplete="off">
             <button class="paywall-btn" id="activateBtn" data-i18n="paywall.btn">激活</button>
             <div class="paywall-error" id="paywallError"></div>
@@ -1104,7 +1112,6 @@ const HTML_PAGE = `
                 
                 'paywall.title': '激活您的使用权限',
                 'paywall.desc': 'VoiceTTS 是付费服务，请输入您的激活码以解锁全部功能',
-                'paywall.sub': '永久使用 · 一次付费',
                 'paywall.btn': '激活',
                 'paywall.contact': '获取激活码请联系：',
                 'paywall.activating': '正在激活...',
