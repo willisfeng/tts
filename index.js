@@ -892,13 +892,6 @@ const HTML_PAGE = `
                 <div class="paywall-title" data-i18n="paywall.title">激活您的使用权限</div>
                 <div class="paywall-desc" data-i18n="paywall.desc">VoiceTTS 是付费服务，请输入您的激活码以解锁全部功能</div>
             </div>
-            <div class="paywall-section-label">价格方案</div>
-            <div class="paywall-price-list">
-                <div class="paywall-price-item"><span class="price-label">3天免费</span></div>
-                <div class="paywall-price-item"><span class="price-label">7天</span><span class="price-value">¥9.9</span></div>
-                <div class="paywall-price-item featured"><span class="price-label">1个月</span><span class="price-value">¥25</span></div>
-                <div class="paywall-price-item"><span class="price-label">3个月</span><span class="price-value">¥60</span></div>
-            </div>
             <div class="paywall-section-label">输入激活码</div>
             <div class="paywall-input-group">
                 <span class="paywall-input-icon">🔑</span>
