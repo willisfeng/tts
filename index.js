@@ -1734,6 +1734,24 @@ async function kvList(env) {
     return Array.from(memUsedCodes);
 }
 
+async function getAllCodeRecords(env) {
+    const kv = getKV(env);
+    if (kv) {
+        try {
+            const list = await kv.list({ prefix: 'code:' });
+            const records = [];
+            for (const key of list.keys) {
+                try {
+                    const val = await kv.get(key.name);
+                    if (val) records.push(JSON.parse(val));
+                } catch (e) {}
+            }
+            return records;
+        } catch (e) {}
+    }
+    return [];
+}
+
 async function isCodeUsed(env, code) {
     const kvVal = await kvGet(env, 'used:' + code);
     if (kvVal !== null) return true;
@@ -1743,6 +1761,24 @@ async function isCodeUsed(env, code) {
 async function markCodeUsed(env, code) {
     memUsedCodes.add(code);
     await kvPut(env, 'used:' + code, Date.now().toString());
+    // 同时更新 code: 记录为已使用
+    const info = await kvGet(env, 'code:' + code);
+    if (info) {
+        try {
+            const data = JSON.parse(info);
+            data.used = true;
+            data.usedAt = Date.now();
+            await kvPut(env, 'code:' + code, JSON.stringify(data));
+        } catch (e) {}
+    }
+}
+
+async function saveCodeRecord(env, code, days) {
+    const now = Date.now();
+    const parts = code.split('-');
+    const expiry = parseInt(parts[parts.length - 2], 36);
+    const info = { code, days, createdAt: now, expiry, used: false, usedAt: null };
+    await kvPut(env, 'code:' + code, JSON.stringify(info));
 }
 
 async function saveLicenseToken(env, token, deviceId) {
@@ -1881,60 +1917,190 @@ async function handleRequest(request, env) {
             const days = parseInt(body.days) || LICENSE_VALIDITY_DAYS;
             const codes = [];
             for (let i = 0; i < count; i++) {
-                codes.push(generateActivationCode(prefix, days));
+                const c = generateActivationCode(prefix, days);
+                codes.push(c);
+                await saveCodeRecord(env, c, days);
             }
             return new Response(JSON.stringify({ codes }), {
                 headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
             });
         }
 
+        // 获取激活码列表 API
+        const adminUrl = new URL(request.url);
+        if (adminUrl.searchParams.get('action') === 'list') {
+            const allCodes = await getAllCodeRecords(env);
+            return new Response(JSON.stringify(allCodes), {
+                headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
+            });
+        }
+
         // 显示管理页面
-        const usedCodeList = await kvList(env);
-        const codesList = usedCodeList.filter(k => k.startsWith('used:')).map(k => `<li><span>${k.replace('used:', '')}</span><span class="used">已使用</span></li>`).join('');
         const html = `<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>激活码管理</title><style>
             *{margin:0;padding:0;box-sizing:border-box}body{font-family:sans-serif;background:#f0f2f5;min-height:100vh}
-            .container{max-width:600px;margin:40px auto;padding:32px;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.1)}
-            h1{text-align:center;margin-bottom:24px;color:#1a1a2e}.form{display:flex;gap:12px;margin-bottom:24px}
-            .input{padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:1rem;flex:1}
-            .input:focus{border-color:#2563eb;outline:none}.btn{padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;white-space:nowrap}
+            .container{max-width:800px;margin:40px auto;padding:32px;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.1)}
+            h1{text-align:center;margin-bottom:24px;color:#1a1a2e}
+            .section{margin-bottom:24px}
+            .section-title{font-size:1.1rem;font-weight:600;margin-bottom:12px;color:#1a1a2e}
+            .form{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+            .input{padding:10px 14px;border:2px solid #e0e0e0;border-radius:8px;font-size:1rem}
+            .input:focus{border-color:#2563eb;outline:none}
+            .btn{padding:10px 20px;background:#2563eb;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;white-space:nowrap}
             .btn:hover{background:#1d4ed8}.btn:disabled{opacity:0.6}
-            .result{margin-bottom:24px}.code-box{background:#f0fdf4;border:2px solid #22c55e;border-radius:8px;padding:16px;margin-bottom:8px;font-family:monospace;font-size:1.1rem;word-break:break-all;text-align:center}
-            .list-title{font-size:1.1rem;font-weight:600;margin-bottom:12px}.list{list-style:none}
-            .list li{display:flex;justify-content:space-between;padding:8px 12px;border-bottom:1px solid #f0f0f0;font-family:monospace;font-size:.85rem}
-            .used{color:#dc2626}.info{color:#6b7280;font-size:.85rem;text-align:center;margin-top:12px}
+            .btn-sm{padding:6px 12px;font-size:.85rem}
+            .result{margin-bottom:16px}.code-box{background:#f0fdf4;border:2px solid #22c55e;border-radius:8px;padding:16px;margin-bottom:8px;font-family:monospace;font-size:1rem;word-break:break-all;text-align:center}
+            table{width:100%;border-collapse:collapse;font-size:.9rem}
+            th,td{padding:10px 12px;text-align:left;border-bottom:1px solid #f0f0f0}
+            th{background:#f8fafc;font-weight:600;color:#475569;font-size:.8rem;text-transform:uppercase}
+            td{font-family:monospace;font-size:.82rem;word-break:break-all}
+            .status-badge{padding:3px 8px;border-radius:12px;font-size:.75rem;font-weight:600}
+            .status-unused{background:#dcfce7;color:#059669}
+            .status-used{background:#fee2e2;color:#dc2626}
+            .status-expired{background:#fef3c7;color:#d97706}
+            .empty{text-align:center;color:#6b7280;padding:24px;font-size:.9rem}
+            .tabs{display:flex;gap:4px;margin-bottom:16px;background:#f1f5f9;padding:4px;border-radius:8px}
+            .tab{padding:8px 16px;border:none;background:transparent;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:500;color:#64748b}
+            .tab.active{background:#fff;color:#1a1a2e;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+            .info{color:#6b7280;font-size:.85rem;text-align:center;margin-top:12px}
+            .stats{display:flex;gap:16px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
+            .stat-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px 20px;text-align:center}
+            .stat-num{font-size:1.5rem;font-weight:700;color:#1a1a2e}
+            .stat-label{font-size:.75rem;color:#64748b;margin-top:2px}
         </style></head><body><div class="container"><h1>🔑 激活码管理</h1>
-            <div class="form"><input type="text" class="input" id="prefix" value="VTTS" placeholder="前缀"><input type="number" class="input" id="days" value="${LICENSE_VALIDITY_DAYS}" placeholder="有效期天数" min="1" max="365" style="width:120px"><button class="btn" id="generateBtn">生成激活码</button></div>
-            <div class="result" id="result"></div>
-            <div class="list-title">已使用的激活码 (${usedCodeList.filter(k => k.startsWith('used:')).length})</div>
-            <ul class="list">${codesList || '<li style="color:#6b7280;text-align:center;padding:16px">暂无使用记录</li>'}</ul>
+            <div class="section">
+                <div class="section-title">📦 生成激活码</div>
+                <div class="form">
+                    <input type="text" class="input" id="prefix" value="VTTS" placeholder="前缀" style="width:100px">
+                    <input type="number" class="input" id="days" value="${LICENSE_VALIDITY_DAYS}" placeholder="有效期天数" min="1" max="365" style="width:100px">
+                    <input type="number" class="input" id="count" value="1" placeholder="数量" min="1" max="50" style="width:80px">
+                    <button class="btn" id="generateBtn">生成激活码</button>
+                </div>
+                <div class="result" id="result"></div>
+            </div>
+            <div class="section">
+                <div class="section-title">📋 激活码列表</div>
+                <div class="stats" id="stats"></div>
+                <div class="tabs">
+                    <button class="tab active" data-tab="all">全部</button>
+                    <button class="tab" data-tab="unused">未使用</button>
+                    <button class="tab" data-tab="used">已使用</button>
+                    <button class="tab" data-tab="expired">已过期</button>
+                </div>
+                <div id="codeTable"></div>
+                <button class="btn btn-sm" id="refreshBtn" style="margin-top:12px">🔄 刷新列表</button>
+            </div>
             <div class="info">${getKV(env) ? '✅ 使用 KV 持久化存储' : '⚠️ 内存存储，重启后记录丢失。建议绑定 KV。'}</div>
         </div>
         <script>
+            const pwd = '${encodeURIComponent(pwd)}';
+            let allCodes = [];
+            let currentTab = 'all';
+
+            async function loadList() {
+                try {
+                    const resp = await fetch('/admin?pwd=' + pwd + '&action=list');
+                    allCodes = await resp.json();
+                } catch(e) {
+                    allCodes = [];
+                }
+                renderStats();
+                renderTable();
+            }
+
+            function getStatus(c) {
+                if (c.used) return 'used';
+                if (Date.now() > c.expiry) return 'expired';
+                return 'unused';
+            }
+
+            function renderStats() {
+                const total = allCodes.length;
+                const used = allCodes.filter(c => c.used).length;
+                const expired = allCodes.filter(c => !c.used && Date.now() > c.expiry).length;
+                const unused = allCodes.filter(c => !c.used && Date.now() <= c.expiry).length;
+                document.getElementById('stats').innerHTML = 
+                    '<div class="stat-item"><div class="stat-num">' + total + '</div><div class="stat-label">总计</div></div>' +
+                    '<div class="stat-item"><div class="stat-num" style="color:#059669">' + unused + '</div><div class="stat-label">未使用</div></div>' +
+                    '<div class="stat-item"><div class="stat-num" style="color:#dc2626">' + used + '</div><div class="stat-label">已使用</div></div>' +
+                    '<div class="stat-item"><div class="stat-num" style="color:#d97706">' + expired + '</div><div class="stat-label">已过期</div></div>';
+            }
+
+            function renderTable() {
+                let list = allCodes;
+                if (currentTab === 'unused') list = allCodes.filter(c => !c.used && Date.now() <= c.expiry);
+                else if (currentTab === 'used') list = allCodes.filter(c => c.used);
+                else if (currentTab === 'expired') list = allCodes.filter(c => !c.used && Date.now() > c.expiry);
+
+                if (list.length === 0) {
+                    document.getElementById('codeTable').innerHTML = '<div class="empty">暂无记录</div>';
+                    return;
+                }
+
+                const rows = list.map(c => {
+                    const status = getStatus(c);
+                    const statusText = status === 'unused' ? '未使用' : status === 'used' ? '已使用' : '已过期';
+                    const statusClass = status === 'unused' ? 'status-unused' : status === 'used' ? 'status-used' : 'status-expired';
+                    const expiryDate = new Date(c.expiry).toLocaleString('zh-CN');
+                    const createDate = new Date(c.createdAt).toLocaleString('zh-CN');
+                    const usedDate = c.usedAt ? new Date(c.usedAt).toLocaleString('zh-CN') : '-';
+                    return '<tr>' +
+                        '<td>' + c.code + '</td>' +
+                        '<td>' + c.days + '天</td>' +
+                        '<td>' + createDate + '</td>' +
+                        '<td>' + expiryDate + '</td>' +
+                        '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
+                        '<td>' + usedDate + '</td>' +
+                        '</tr>';
+                }).join('');
+
+                document.getElementById('codeTable').innerHTML = 
+                    '<table><thead><tr><th>激活码</th><th>期限</th><th>创建时间</th><th>有效期至</th><th>状态</th><th>使用时间</th></tr></thead><tbody>' + rows + '</tbody></table>';
+            }
+
+            // 切换 Tab
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentTab = this.dataset.tab;
+                    renderTable();
+                });
+            });
+
+            // 生成激活码
             document.getElementById('generateBtn').addEventListener('click', async function() {
                 const btn = this;
                 btn.disabled = true;
                 btn.textContent = '生成中...';
                 const prefix = document.getElementById('prefix').value || 'VTTS';
                 const days = parseInt(document.getElementById('days').value) || ${LICENSE_VALIDITY_DAYS};
+                const count = parseInt(document.getElementById('count').value) || 1;
                 try {
-                    const resp = await fetch('/admin?pwd=${encodeURIComponent(pwd)}', {
+                    const resp = await fetch('/admin?pwd=' + pwd, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ prefix, count: 1, days })
+                        body: JSON.stringify({ prefix, count, days })
                     });
                     const data = await resp.json();
                     document.getElementById('result').innerHTML = data.codes.map(c => {
                         const parts = c.split('-');
                         const expiryTs = parseInt(parts[parts.length - 2], 36);
                         const expiryDate = new Date(expiryTs).toLocaleString('zh-CN');
-                        return '<div class="code-box">' + c + '</div><div style="text-align:center;color:#6b7280;font-size:.85rem;margin-bottom:12px">有效期至：' + expiryDate + '</div>';
+                        return '<div class="code-box">' + c + '</div><div style="text-align:center;color:#6b7280;font-size:.85rem;margin-bottom:12px">有效期至：' + expiryDate + '（' + days + '天）</div>';
                     }).join('');
+                    loadList();
                 } catch(e) {
                     document.getElementById('result').innerHTML = '<div class="code-box" style="background:#fef2f2;border-color:#dc2626">生成失败</div>';
                 }
                 btn.disabled = false;
                 btn.textContent = '生成激活码';
             });
+
+            // 刷新
+            document.getElementById('refreshBtn').addEventListener('click', loadList);
+
+            // 初始加载
+            loadList();
         </script></body></html>`;
         return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
     }
