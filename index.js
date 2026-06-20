@@ -2352,7 +2352,7 @@ async function handleRequest(request, env) {
             <div class="info">${getKV(env) ? '✅ 使用 KV 持久化存储' : '⚠️ 内存存储，重启后记录丢失。建议绑定 KV。'}</div>
         </div>
         <script>
-            const pwd = '${pwd.replace(/\\/g, "\\\\").replace(/'/g, "\\'")}';
+            const pwd = ${JSON.stringify(pwd)};
             const epwd = encodeURIComponent(pwd);
             let allCodes = [];
             let currentTab = 'all';
