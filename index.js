@@ -631,6 +631,7 @@ const HTML_PAGE = `
             padding: 20px;
         }
         .paywall-overlay.hidden { display: none; }
+        .hidden { display: none !important; }
         .paywall-card {
             background: var(--surface-color);
             border-radius: 20px;
@@ -1629,9 +1630,17 @@ const HTML_PAGE = `
                     const data = await resp.json();
                     if (resp.ok && data.success) {
                         localStorage.setItem('VoiceTTS-license', data.token);
-                        hidePaywall();
-                        updateLicenseBadge(data.expiry);
-                        alert(translations[currentLanguage]['paywall.success']);
+                        // 在 paywall 卡片上显示激活成功信息
+                        const expiryDate = data.expiry ? new Date(data.expiry) : null;
+                        const dateStr = expiryDate ? expiryDate.toLocaleDateString('zh-CN') : '';
+                        const remaining = expiryDate ? Math.ceil((data.expiry - Date.now()) / (24 * 3600 * 1000)) : 0;
+                        paywallError.style.color = '#059669';
+                        paywallError.innerHTML = '✅ 激活成功！<br>激活码：<b>' + code + '</b><br>有效期至：<b>' + dateStr + '</b>（剩余 ' + remaining + ' 天）';
+                        // 延迟隐藏 paywall，让用户看到成功信息
+                        setTimeout(() => {
+                            hidePaywall();
+                            updateLicenseBadge(data.expiry);
+                        }, 1500);
                     } else {
                         paywallError.textContent = translations[currentLanguage][data.error || 'paywall.invalid'];
                     }
@@ -1888,6 +1897,7 @@ function verifyActivationCode(code) {
 // 已使用的激活码和令牌（优先 KV，fallback 内存）
 const memUsedCodes = new Set();
 const memDeviceTokens = new Map();
+const memCodeRecords = [];  // 内存 fallback：激活码记录
 let kvAvailable = false;
 
 function getKV(env) {
@@ -1932,7 +1942,7 @@ async function getAllCodeRecords(env) {
                         records.push(rec);
                         seen.add(rec.code);
                     }
-                } catch (e) {}
+                } catch (e) { console.error('getAllCodeRecords get error:', e); }
             }
             // 回填旧激活码：扫描 used: 前缀，补上没有 code: 记录的旧码
             try {
@@ -1965,11 +1975,15 @@ async function getAllCodeRecords(env) {
                         await kv.put('code:' + code, JSON.stringify(backfillData)).catch(() => {});
                     }
                 }
-            } catch (e) {}
+            } catch (e) { console.error('getAllCodeRecords usedList error:', e); }
             return records;
-        } catch (e) {}
+        } catch (e) {
+            console.error('getAllCodeRecords list error:', e);
+            // KV 读取失败，fallback 到内存记录
+        }
     }
-    return [];
+    // 无 KV 或 KV 失败，返回内存记录
+    return [...memCodeRecords];
 }
 
 async function isCodeUsed(env, code) {
@@ -1991,6 +2005,12 @@ async function markCodeUsed(env, code) {
             await kvPut(env, 'code:' + code, JSON.stringify(data));
         } catch (e) {}
     }
+    // 同步内存记录
+    const memIdx = memCodeRecords.findIndex(r => r.code === code);
+    if (memIdx >= 0) {
+        memCodeRecords[memIdx].used = true;
+        memCodeRecords[memIdx].usedAt = Date.now();
+    }
 }
 
 async function saveCodeRecord(env, code, days) {
@@ -1998,7 +2018,17 @@ async function saveCodeRecord(env, code, days) {
     const parts = code.split('-');
     const expiry = parseInt(parts[parts.length - 2], 36);
     const info = { code, days, createdAt: now, expiry, used: false, usedAt: null };
-    await kvPut(env, 'code:' + code, JSON.stringify(info));
+    const kv = getKV(env);
+    if (kv) {
+        try { await kv.put('code:' + code, JSON.stringify(info)); } catch (e) { console.error('saveCodeRecord KV error:', e); }
+    }
+    // 内存 fallback
+    const existingIdx = memCodeRecords.findIndex(r => r.code === code);
+    if (existingIdx >= 0) {
+        memCodeRecords[existingIdx] = info;
+    } else {
+        memCodeRecords.push(info);
+    }
 }
 
 async function saveLicenseToken(env, token, deviceId, expiry, code) {
@@ -2234,6 +2264,10 @@ async function handleRequest(request, env) {
                     }
                 } catch (e) {}
             }
+            // 同步内存记录
+            const memIdx = memCodeRecords.findIndex(r => r.code === code);
+            if (memIdx >= 0) memCodeRecords.splice(memIdx, 1);
+            memUsedCodes.delete(code);
             return new Response(JSON.stringify({ success: true }), {
                 headers: { "Content-Type": "application/json", ...makeCORSHeaders() }
             });
@@ -2876,8 +2910,11 @@ function getSsml(text, voiceName, rate, pitch, volume, style, slien = 0) {
     const langMatch = voiceName.match(/^([a-z]{2}-[A-Z]{2})/);
     const lang = langMatch ? langMatch[1] : 'en-US';
     
-    // 只有中文语音支持 style 属性，其他语言不需要
+    // 只有中文语音支持 style 属性，非中文语音的 style 会被忽略
     const isChineseVoice = voiceName.startsWith('zh-CN');
+    
+    // 日志：记录实际使用的 style 参数
+    console.log(`[getSsml] voice=${voiceName}, style=${style}, isChinese=${isChineseVoice}, styleApplied=${isChineseVoice}`);
     
     let slien_str = '';
     if (slien > 0) {
